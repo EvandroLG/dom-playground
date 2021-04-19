@@ -55,6 +55,7 @@
       function createPost() {
         const elements = {};
         elements.post = document.createElement('div');
+        elements.link = document.createElement('a');
         elements.title = document.createElement('h2');
         elements.image = createImage();
         elements.description = document.createElement('p');
@@ -62,10 +63,12 @@
         const idx = Math.floor(Math.random() * 1000);
         elements.post.setAttribute('id', `id-${idx}`);
         elements.post.classList.add('post');
+        elements.link.setAttribute('href', `#${idx}`);
         elements.title.textContent = `Title ${idx}`;
         elements.description.textContent = `Description ${idx}`;
 
-        elements.post.appendChild(elements.title);
+        elements.link.appendChild(elements.title);
+        elements.post.appendChild(elements.link);
         elements.post.appendChild(elements.image);
         elements.post.appendChild(elements.description);
 
@@ -89,6 +92,19 @@
         elements.main = document.querySelector('#main');
 
         elements.main.appendChild(posts);
+      }
+
+      function clickOnPosts() {
+        function onClick(e) {
+          const element = e.target;
+
+          if (element.matches('.post h2')) {
+            e.preventDefault();
+            console.log(element.closest('a').getAttribute('href'));
+          }
+        }
+
+        document.querySelector('#main').addEventListener('click', onClick, false);
       }
 
       function appendGoToHeader() {
@@ -128,6 +144,7 @@
         elements.footer = document.querySelector('#footer');
 
         appendGoToHeader();
+        clickOnPosts();
 
         const io = new IntersectionObserver((entries) => {
           if (entries.some(entry => entry.intersectionRatio > 0)) {
