@@ -27,9 +27,6 @@
       <h1>Header</h1>
     </header>
     <main id="main"></main>
-    <footer id="footer">
-      Footer
-    </footer>
 
     <script>
       function getSrcImage() {
@@ -44,10 +41,14 @@
         return images[randomIdx];
       }
 
-      function createImage() {
+      function createImage(shouldLazy = false) {
         const elements = {};
         elements.image = new Image();
         elements.image.src = getSrcImage();
+
+        if (shouldLazy) {
+          elements.images.setAttribute('loading', 'lazy');
+        }
 
         return elements.image;
       }
@@ -139,20 +140,29 @@
         document.body.appendChild(elements.link);
       }
 
-      function onReady() {
+      function appendFooter() {
         const elements = {};
-        elements.footer = document.querySelector('#footer');
+        elements.footer = document.createElement('footer');
+        elements.footer.textContent = 'Footer';
+        elements.footer.setAttribute('id', 'footer');
+        elements.main = document.querySelector('#main');
 
+        elements.main.insertAdjacentElement('afterend', elements.footer);
+      }
+
+      function onReady() {
         appendGoToHeader();
+        appendPosts();
         clickOnPosts();
+        appendFooter();
 
         const io = new IntersectionObserver((entries) => {
           if (entries.some(entry => entry.intersectionRatio > 0)) {
-            appendPosts();
+            appendPosts(true);
           }
         }, { threshold: 0.1 });
 
-        io.observe(elements.footer);
+        io.observe(document.querySelector('#footer'));
       }
 
       document.addEventListener('DOMContentLoaded', onReady, false);
