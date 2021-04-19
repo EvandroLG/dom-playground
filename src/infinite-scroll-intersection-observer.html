@@ -1,0 +1,144 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Infinite Scroll</title>
+    <style>
+      .post img {
+        width: 300px;
+        height: 300px;
+        object-fit: cover;
+      }
+
+      .go-back {
+        opacity: 0;
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        transition: opacity ease-in 0.6s;
+      }
+
+      .go-back.show {
+        opacity: 1;
+      }
+    </style>
+  </head>
+  <body>
+    <header id="header">
+      <h1>Header</h1>
+    </header>
+    <main id="main"></main>
+    <footer id="footer">
+      Footer
+    </footer>
+
+    <script>
+      function getSrcImage() {
+        const images = [
+          'https://media.gettyimages.com/photos/world-cup-brazil-picture-id977992276?s=2048x2048',
+          'https://media.gettyimages.com/photos/lets-dance-all-our-troubles-away-picture-id921837638?s=2048x2048',
+          'https://media.gettyimages.com/photos/brazilian-kid-playing-soccer-in-the-street-picture-id982137146?s=2048x2048',
+        ];
+
+        const randomIdx = Math.floor(Math.random() * images.length);
+
+        return images[randomIdx];
+      }
+
+      function createImage() {
+        const elements = {};
+        elements.image = new Image();
+        elements.image.src = getSrcImage();
+
+        return elements.image;
+      }
+
+      function createPost() {
+        const elements = {};
+        elements.post = document.createElement('div');
+        elements.title = document.createElement('h2');
+        elements.image = createImage();
+        elements.description = document.createElement('p');
+
+        const idx = Math.floor(Math.random() * 1000);
+        elements.post.setAttribute('id', `id-${idx}`);
+        elements.post.classList.add('post');
+        elements.title.textContent = `Title ${idx}`;
+        elements.description.textContent = `Description ${idx}`;
+
+        elements.post.appendChild(elements.title);
+        elements.post.appendChild(elements.image);
+        elements.post.appendChild(elements.description);
+
+        return elements.post;
+      }
+
+      function createListOfPosts(limit) {
+        const fragment = document.createDocumentFragment();
+
+        for (let i = 0; i < limit; i++) {
+          const post = createPost();
+          fragment.appendChild(post);
+        }
+
+        return fragment;
+      }
+
+      function appendPosts() {
+        const posts = createListOfPosts(15);
+        const elements = {};
+        elements.main = document.querySelector('#main');
+
+        elements.main.appendChild(posts);
+      }
+
+      function appendGoToHeader() {
+        const elements = {};
+        elements.header = document.querySelector('#header');
+        elements.link = document.createElement('a');
+        elements.link.href = '#header';
+        elements.link.textContent = 'Go back!';
+        elements.link.setAttribute('id', 'go-back');
+        elements.link.classList.add('go-back');
+
+        elements.link.addEventListener('click', (e) => {
+          e.preventDefault();
+
+          window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+          });
+        }, false);
+
+        const io = new IntersectionObserver((entries) => {
+          if (entries.some(entry => entry.intersectionRatio <= 0)) {
+            elements.link.classList.add('show');
+            return;
+          }
+
+          elements.link.classList.remove('show');
+        });
+
+        io.observe(elements.header);
+
+        document.body.appendChild(elements.link);
+      }
+
+      function onReady() {
+        const elements = {};
+        elements.footer = document.querySelector('#footer');
+
+        appendGoToHeader();
+
+        const io = new IntersectionObserver((entries) => {
+          if (entries.some(entry => entry.intersectionRatio > 0)) {
+            appendPosts();
+          }
+        }, { threshold: 0.1 });
+
+        io.observe(elements.footer);
+      }
+
+      document.addEventListener('DOMContentLoaded', onReady, false);
+    </script>
+  </body>
+</html>

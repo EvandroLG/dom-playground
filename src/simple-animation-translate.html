@@ -24,7 +24,7 @@
           return;
         }
 
-        const move = document.body.clientWidth - element.clientWidth;
+        const move = document.body.clientWidth - element.offsetWidth;
         element.style.transform = `translateX(${move}px)`;
       }
 
