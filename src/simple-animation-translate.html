@@ -1,0 +1,69 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Simple Animation Translate</title>
+    <style>
+      .container {
+        width: 100px;
+        height: 100px;
+        color: #FFF;
+        background: red;
+        padding: 3px;
+        cursor: pointer;
+        transition: transform ease-in 0.6s;
+      }
+    </style>
+  </head>
+  <body>
+    <main id="main"></main>
+
+    <script>
+      function animateElement(element, moveToRight) {
+        if (!moveToRight) {
+          element.style.removeProperty('transform');
+          return;
+        }
+
+        const move = document.body.clientWidth - element.clientWidth;
+        element.style.transform = `translateX(${move}px)`;
+      }
+
+      function createElement() {
+        const states = {
+          movedToRight: false,
+          isAnimationRunning: false,
+        };
+
+        const element = document.createElement('div');
+        const text = 'Click me to move me to the right / left';
+
+        element.classList.add('container');
+        element.textContent = text;
+        element.setAttribute('title', text);
+
+        element.addEventListener('transitionend', () => {
+          states.isAnimationRunning = false;
+        }, false);
+
+        element.addEventListener('click', (e) => {
+          if (states.isAnimationRunning) {
+            return;
+          }
+
+          states.isAnimationRunning = true;
+          states.movedToRight = !states.movedToRight;
+          animateElement(e.target, states.movedToRight);
+        }, false);
+
+        return element;
+      }
+
+      function onReady() {
+        const element = createElement();
+        document.querySelector('#main').appendChild(element);
+      }
+
+      document.addEventListener('DOMContentLoaded', onReady, false);
+    </script>
+  </body>
+</html>
