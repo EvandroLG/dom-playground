@@ -1,0 +1,58 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Closest</title>
+    <style>
+      div {
+        width: 30px;
+        height: 30px;
+        background: #CCC;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="level-1">
+      <div id="level-2">
+        <div id="level-3">
+          <div id="level-4">
+            <div id="level-5">
+              <div id="level-6">
+                <div id="level-7">
+                  <div id="level-8">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      function closest(element, selectorTarget) {
+        if (!element) {
+          return null;
+        }
+
+        let current = element.parentElement;
+
+        while (current) {
+          if (current.matches(selectorTarget)) {
+            return current;
+          }
+
+          current = current.parentElement;
+        }
+
+        return null;
+      }
+
+      function onReady() {
+        const element = closest(document.querySelector('#level-8'), 'div#level-2');
+        element.style.border = '1px solid blue';
+      }
+
+      document.addEventListener('DOMContentLoaded', onReady, false);
+    </script>
+  </body>
+</html>
