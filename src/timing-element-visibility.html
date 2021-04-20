@@ -128,38 +128,38 @@
         let timerId = null;
 
         function convertTime(value) {
-          return (value > 9 ? '' : '0') + value;
+          return (value + '').padStart(2, '0');
+        }
+
+        function updateTime() {
+          timerId = setInterval(() => {
+            if (seconds < 59) {
+              seconds = seconds + 1;
+              elements.seconds.textContent = convertTime(seconds);
+
+              return;
+            }
+
+            if (minutes < 60) {
+              minutes = minutes + 1;
+              elements.minutes.textContent = convertTime(minutes) + ':';
+              elements.seconds.textContent = '00';
+              seconds = 0;
+
+              return;
+            }
+
+            hours = hours + 1;
+            elements.hours.textContent = convertTime(hours) + ':';
+            elements.minutes.textContent = '00';
+            elements.seconds.textContent = '00';
+            minutes = 0;
+            seconds = 0;
+          }, 1000);
         }
 
         return {
           startTimer() {
-            function updateTime() {
-              timerId = setInterval(() => {
-                if (seconds < 59) {
-                  seconds = seconds + 1;
-                  elements.seconds.textContent = convertTime(seconds);
-
-                  return;
-                }
-
-                if (minutes < 60) {
-                  minutes = minutes + 1;
-                  elements.minutes.textContent = convertTime(minutes) + ':';
-                  elements.seconds.textContent = '00';
-                  seconds = 0;
-
-                  return;
-                }
-
-                hours = hours + 1;
-                elements.hours.textContent = convertTime(hours) + ':';
-                elements.minutes.textContent = '00';
-                elements.seconds.textContent = '00';
-                minutes = 0;
-                seconds = 0;
-              }, 1000);
-            }
-
             const io = new IntersectionObserver((entries) => {
               if (entries.some(entry => entry.intersectionRatio > 0)) {
                 updateTime();
