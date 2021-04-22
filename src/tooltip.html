@@ -1,0 +1,91 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Tooltip</title>
+    <style>
+      #main {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 800px;
+        margin: 0 auto;
+      }
+
+      #main a {
+        width: 100px;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <main id="main"></main>
+
+    <script>
+      function debounce(fn, time) {
+        let timeId = null;
+
+        return () => {
+          if (timeId) {
+            return;
+          }
+
+          timeId = setTimeout(() => {
+            fn();
+            timeId = null;
+          }, time);
+        };
+      }
+
+      function Tooltip(target, title) {
+        const className = 'tooltip';
+        const elements = {};
+        elements.tooltip = document.createElement('span');
+        elements.tooltip.classList.add(className);
+        elements.tooltip.textContent = title;
+        Object.assign(elements.tooltip.style, {
+          position: 'absolute',
+          top: '20px',
+          left: '0',
+          background: '#ccc'
+        });
+
+        function onMouseMove() {
+          if (!target.querySelector(`.${className}`)) {
+            target.style.position = 'relative';
+            target.appendChild(elements.tooltip);
+          }
+        }
+
+        function onMouseLeave() {
+          if (target.querySelector(`.${className}`)) {
+            target.removeAttribute('style');
+            elements.tooltip.remove();
+          }
+        }
+
+        target.addEventListener('mousemove', debounce(onMouseMove, 500), false);
+        target.addEventListener('mouseleave', debounce(onMouseLeave, 500), false);
+      }
+
+      function onReady() {
+        const elements = {};
+        elements.main = document.querySelector('#main');
+        elements.link = document.createElement('a');
+        elements.fragment = document.createDocumentFragment();
+
+        for (let i = 0; i < 10; i++) {
+          const link = elements.link.cloneNode(false);
+          link.setAttribute('href', `#${i + 1}`);
+          link.textContent = `Text ${i + 1}`;
+          Tooltip(link, `Title ${i + 1}`);
+
+          elements.fragment.appendChild(link);
+        }
+
+        elements.main.appendChild(elements.fragment);
+      }
+
+      document.addEventListener('DOMContentLoaded', onReady, false);
+    </script>
+  </body>
+</html>
