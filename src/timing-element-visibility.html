@@ -125,37 +125,43 @@
         let seconds = 0;
         let minutes = 0;
         let hours = 0;
-        let timerId = null;
+        let animationId = null;
 
         function convertTime(value) {
           return (value + '').padStart(2, '0');
         }
 
         function updateTime() {
-          timerId = setInterval(() => {
-            if (seconds < 59) {
-              seconds = seconds + 1;
-              elements.seconds.textContent = convertTime(seconds);
+          let start = performance.now();
 
-              return;
+          function animate(timestamp) {
+            const elapsed = timestamp - start;
+
+            if (elapsed >= 1000) {
+              start = performance.now();
+
+              if (seconds < 59) {
+                seconds = seconds + 1;
+                elements.seconds.textContent = convertTime(seconds);
+              } else if (minutes < 59) {
+                minutes = minutes + 1;
+                elements.minutes.textContent = convertTime(minutes) + ':';
+                elements.seconds.textContent = '00';
+                seconds = 0;
+              } else {
+                hours = hours + 1;
+                elements.hours.textContent = convertTime(hours) + ':';
+                elements.minutes.textContent = '00';
+                elements.seconds.textContent = '00';
+                minutes = 0;
+                seconds = 0;
+              }
             }
 
-            if (minutes < 60) {
-              minutes = minutes + 1;
-              elements.minutes.textContent = convertTime(minutes) + ':';
-              elements.seconds.textContent = '00';
-              seconds = 0;
+            animationId = requestAnimationFrame(animate);
+          };
 
-              return;
-            }
-
-            hours = hours + 1;
-            elements.hours.textContent = convertTime(hours) + ':';
-            elements.minutes.textContent = '00';
-            elements.seconds.textContent = '00';
-            minutes = 0;
-            seconds = 0;
-          }, 1000);
+          animationId = requestAnimationFrame(animate);
         }
 
         return {
@@ -166,7 +172,7 @@
                 return;
               }
 
-              clearInterval(timerId);
+              cancelAnimationFrame(animationId);
             });
 
             io.observe(elements.timer);
