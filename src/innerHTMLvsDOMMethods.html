@@ -40,11 +40,23 @@
           return (''+(value+1)).padStart(2, '0');
         }
 
+        function removeOnClick() {
+          const table = document.querySelector('#table');
+
+          function onClick({ target }) {
+            if (target.matches('button')) {
+              target.closest('tr').remove();
+            }
+          }
+
+          table.addEventListener('click', onClick, false);
+        }
+
         function onClickButtonInner() {
           console.time();
 
           const output = [];
-          output.push('<table>');
+          output.push('<table id="table">');
 
           for (let i = 0; i < tableSize; i++) {
             output.push('<tr>');
@@ -54,12 +66,16 @@
             output.push('<td>');
             output.push(getRandomName());
             output.push('</td>');
+            output.push('<td>');
+            output.push('<button type="button">Delete</button>');
+            output.push('</td>');
             output.push('</tr>');
           }
 
           output.push('</table>');
 
           elements.content.innerHTML = output.join('');
+          removeOnClick();
 
           console.timeEnd();
         }
@@ -77,24 +93,31 @@
 
           const dom = {};
           dom.table = document.createElement('table');
+          dom.table.setAttribute('id', 'table');
           dom.tr = document.createElement('tr');
           dom.td = document.createElement('td');
+          dom.button = document.createElement('button');
+          dom.button.setAttribute('type', 'button');
 
           for (let i = 0; i < tableSize; i++) {
-            const row = dom.tr.cloneNode();
-            const columnIdx = dom.td.cloneNode();
-            const columnName = dom.td.cloneNode();
+            const row = dom.tr.cloneNode(false);
+            const columnIdx = dom.td.cloneNode(false);
+            const columnName = dom.td.cloneNode(false);
+            const deleteButton = dom.button.cloneNode(false);
 
             columnIdx.textContent = getIdx(i);
             columnName.textContent = getRandomName();
+            deleteButton.textContent = 'Delete';
 
             row.appendChild(columnIdx);
             row.appendChild(columnName);
+            row.appendChild(deleteButton);
             dom.table.appendChild(row);
           }
 
           cleanContent();
           elements.content.appendChild(dom.table);
+          removeOnClick();
 
           console.timeEnd();
         }
