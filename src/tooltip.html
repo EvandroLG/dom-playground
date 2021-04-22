@@ -24,13 +24,14 @@
       function debounce(fn, time) {
         let timeId = null;
 
-        return () => {
+        return (...args) => {
           if (timeId) {
-            return;
+            clearTimeout(timeId);
+            timeId = null;
           }
 
           timeId = setTimeout(() => {
-            fn();
+            fn.apply(this, args);
             timeId = null;
           }, time);
         };
@@ -45,15 +46,18 @@
         Object.assign(elements.tooltip.style, {
           position: 'absolute',
           top: '20px',
-          left: '0',
           background: '#ccc'
         });
 
-        function onMouseMove() {
+        function onMouseMove({ target, clientX }) {
           if (!target.querySelector(`.${className}`)) {
             target.style.position = 'relative';
             target.appendChild(elements.tooltip);
           }
+
+          const rect = target.getBoundingClientRect();
+          const left = clientX - rect.left;
+          elements.tooltip.style.left = `${left}px`;
         }
 
         function onMouseLeave() {
@@ -63,8 +67,8 @@
           }
         }
 
-        target.addEventListener('mousemove', debounce(onMouseMove, 500), false);
-        target.addEventListener('mouseleave', debounce(onMouseLeave, 500), false);
+        target.addEventListener('mousemove', onMouseMove, false);
+        target.addEventListener('mouseleave', debounce(onMouseLeave, 100), false);
       }
 
       function onReady() {
