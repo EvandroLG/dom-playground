@@ -99,8 +99,8 @@
       }
 
       function clearSearchResults(main) {
-        if (main.firstChild) {
-          main.innerHTMl = '';
+        while (main.firstChild) {
+          main.firstChild.remove();
         }
       }
 
