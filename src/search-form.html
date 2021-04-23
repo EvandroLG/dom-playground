@@ -1,0 +1,160 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Search form</title>
+  </head>
+  <body>
+    <form id="search-form" action="/search">
+      <input type="search" name="q">
+      <button>Search</button>
+    </form>
+    <main id="result"></main>
+
+    <script>
+      function getSearchDataUrl(form, options = {}) {
+        const offset = options.offset || 0;
+        console.log(`calling api with offset ${offset}`);
+        const time = Math.floor(Math.random() * (500 - 100 + 1) + 100);
+        const limit = 5;
+        const result = [
+          {
+            title: 'Title 1',
+            description: 'Description 1'
+          },
+          {
+            title: 'Title 2',
+            description: 'Description 2'
+          },
+          {
+            title: 'Title 3',
+            description: 'Description 3'
+          },
+          {
+            title: 'Title 4',
+            description: 'Description 4'
+          },
+          {
+            title: 'Title 5',
+            description: 'Description 5'
+          },
+          {
+            title: 'Title 6',
+            description: 'Description 6'
+          },
+          {
+            title: 'Title 7',
+            description: 'Description 7'
+          },
+          {
+            title: 'Title 8',
+            description: 'Description 8'
+          },
+          {
+            title: 'Title 9',
+            description: 'Description 9'
+          },
+          {
+            title: 'Title 10',
+            description: 'Description 10'
+          },
+          {
+            title: 'Title 11',
+            description: 'Description 11'
+          },
+          {
+            title: 'Title 12',
+            description: 'Description 12'
+          },
+          {
+            title: 'Title 13',
+            description: 'Description 13'
+          },
+          {
+            title: 'Title 14',
+            description: 'Description 14'
+          },
+          {
+            title: 'Title 15',
+            description: 'Description 9'
+          },
+        ];
+
+        return new Promise((resolve) => {
+          setTimeout(() => {
+            resolve(result.slice(offset, limit + offset));
+          }, time);
+        });
+      }
+
+      async function fetchData(form, offset=0) {
+        const result = await getSearchDataUrl(form, { offset });
+
+        if (!result.length) {
+          return [];
+        }
+
+        const newResult = await fetchData(form, offset + result.length);
+
+        return result.concat(newResult);
+      }
+
+      function clearSearchResults(main) {
+        if (main.firstChild) {
+          main.innerHTMl = '';
+        }
+      }
+
+      function createSearchResults(main, items) {
+        const elements = {};
+        elements.fragment = document.createDocumentFragment();
+        elements.item = document.createElement('div');
+        elements.title = document.createElement('h2');
+        elements.description = document.createElement('p');
+
+        for (const item of items) {
+          const element = elements.item.cloneNode(false);
+          const title = elements.title.cloneNode(false);
+          const description = elements.description.cloneNode(false);
+
+          title.textContent = item.title;
+          description.textContent = item.description;
+
+          element.appendChild(title);
+          element.appendChild(description);
+          elements.fragment.appendChild(element);
+        }
+
+        clearSearchResults(main);
+        main.appendChild(elements.fragment);
+      }
+
+      function showLoading(main) {
+        clearSearchResults(main);
+
+        const elements = {};
+        elements.loading = document.createElement('div');
+        elements.loading.textContent = 'Loading...';
+
+        main.appendChild(elements.loading);
+      }
+
+      function onReady() {
+        const elements = {};
+        elements.form = document.querySelector('#search-form');
+        elements.main = document.querySelector('#result');
+
+        async function onSubmit(e) {
+          e.preventDefault();
+
+          showLoading(elements.main);
+          const items = await fetchData(elements.form);
+          createSearchResults(elements.main, items);
+        }
+
+        elements.form.addEventListener('submit', onSubmit, false);
+      }
+
+      document.addEventListener('DOMContentLoaded', onReady, false);
+    </script>
+  </body>
+</html>
