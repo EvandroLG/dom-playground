@@ -1,0 +1,93 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Find nodes with the same text</title>
+    <style>
+      div {
+        padding: 10px;
+        border: 1px solid #000;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="node-1">
+      <div>
+        JavaScript
+        <div>
+          <div>
+            TypeScript
+            <div>
+              HTML
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="node-2">
+      <div>
+        CSS
+        <div>
+          TypeScript
+        </div>
+      </div>
+    </div>
+
+    <script>
+      function storeTexts(node, cachedTexts = {}) {
+        for (const child of node.childNodes) {
+          if (child.nodeType === Node.TEXT_NODE) {
+            const trimmed = child.wholeText.trim()
+
+            if (trimmed) {
+              cachedTexts[trimmed] = child.parentElement;
+            }
+          } else if (child.nodeType === Node.ELEMENT_NODE) {
+            storeTexts(child, cachedTexts);
+          }
+        }
+
+        return cachedTexts;
+      }
+
+      function findNodesWithSameText(leftNode, rightNode) {
+        const textNodes = storeTexts(leftNode);
+        const pairs = [];
+
+        (function findNodesHelper(node) {
+          for (const child of node.childNodes) {
+            if (child.nodeType === Node.TEXT_NODE) {
+              const trimmed = child.wholeText.trim();
+
+              if (trimmed in textNodes) {
+                pairs.push(textNodes[trimmed], child.parentElement);
+                break;
+              }
+            } else if (child.nodeType === Node.ELEMENT_NODE) {
+              findNodesHelper(child);
+            }
+          }
+        })(rightNode);
+
+        return pairs;
+      }
+
+      function highlightNodes(nodes) {
+        for (const node of nodes) {
+          node.style.borderColor = 'red';
+        }
+      }
+
+      function onReady() {
+        const elements = {};
+        elements.leftNode = document.querySelector('#node-1');
+        elements.rightNode = document.querySelector('#node-2');
+
+        const nodes = findNodesWithSameText(elements.leftNode, elements.rightNode);
+        highlightNodes(nodes);
+      }
+
+      document.addEventListener('DOMContentLoaded', onReady, false);
+    </script>
+  </body>
+</html>
