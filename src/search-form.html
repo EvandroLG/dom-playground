@@ -6,7 +6,7 @@
   <body>
     <form id="search-form" action="/search">
       <input type="search" name="q">
-      <button>Search</button>
+      <button id="button-search">Search</button>
     </form>
     <main id="result"></main>
 
@@ -142,13 +142,16 @@
         const elements = {};
         elements.form = document.querySelector('#search-form');
         elements.main = document.querySelector('#result');
+        elements.button = document.querySelector('#button-search');
 
         async function onSubmit(e) {
           e.preventDefault();
 
+          elements.button.setAttribute('disabled', 'disabled');
           showLoading(elements.main);
           const items = await fetchData(elements.form);
           createSearchResults(elements.main, items);
+          elements.button.removeAttribute('disabled');
         }
 
         elements.form.addEventListener('submit', onSubmit, false);
