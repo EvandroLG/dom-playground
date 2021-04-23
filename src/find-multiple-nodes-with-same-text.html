@@ -1,0 +1,109 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Find nodes with the same text</title>
+    <style>
+      body > div {
+        margin-bottom: 20px;
+      }
+
+      div {
+        padding: 10px;
+        border: 1px solid #000;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="main">
+      <div id="node-1">
+        <div>
+          JavaScript
+          <div>
+            <div>
+              TypeScript
+              <div>
+                HTML
+                <div>CSS</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="node-2">
+        <div>
+          CSS
+          <div>
+            TypeScript
+          </div>
+        </div>
+      </div>
+
+      <div id="node-3">
+        <div>
+          Python
+          <div>
+            <div>
+              Ruby
+              <div>
+                TypeScript
+                <div>
+                  Lua
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      function highlightNodes(foundNodes) {
+        for (const nodes of foundNodes) {
+          for (const node of nodes) {
+            node.style.borderColor = 'red';
+          }
+        }
+      }
+
+      function storeNodes(node, map) {
+        const children = node.childNodes;
+
+        for (const child of children) {
+          if (child.nodeType === Node.TEXT_NODE) {
+            const trimmed = child.wholeText.trim();
+
+            if (trimmed) {
+              if (trimmed in map) {
+                map[trimmed].push(child.parentElement);
+              } else {
+                map[trimmed] = [child.parentElement];
+              }
+            }
+          } else if (child.nodeType === Node.ELEMENT_NODE) {
+            storeNodes(child, map);
+          }
+        }
+      }
+
+      function findNodesWithSameText(nodes) {
+        const map = {};
+
+        for (const node of nodes) {
+          storeNodes(node, map);
+        }
+
+        return Object.values(map).filter((item) => item.length >= nodes.length);
+      }
+
+      function onReady() {
+        const children = document.querySelector('#main').children;
+        const foundNodes = findNodesWithSameText(children);
+
+        highlightNodes(foundNodes);
+      }
+
+      document.addEventListener('DOMContentLoaded', onReady, false);
+    </script>
+  </body>
+</html>
