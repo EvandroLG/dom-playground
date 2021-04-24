@@ -1,0 +1,78 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Find Corresponding Node Between Two Roots</title>
+    <style>
+      body > div {
+        margin-bottom: 20px;
+      }
+
+      div {
+        padding: 10px;
+        border: 1px solid #000;
+        margin-bottom: 5px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root-a">
+      <div>
+        JavaScript
+        <div>
+          TypeScript
+          <div>HTML</div>
+          <div id="node-a" style="border: 2px dashed blue">CSS</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="root-b">
+      <div>
+         Python 
+        <div>
+          Ruby 
+          <div>Lua</div>
+          <div>Java</div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      function findRootPath(root, node) {
+        const path = [];
+        let current = node;
+
+        while (current !== root) {
+          const index = [...current.parentElement.children].indexOf(current);
+          path.push(index);
+          current = current.parentElement;
+        }
+
+        return path;
+      }
+
+      function findNodeByPath(root, path) {
+        let current = root;
+
+        while (path.length) {
+          current = current.children[path.pop()];
+        }
+
+        return current;
+      }
+
+      function onReady() {
+        const elements = {};
+        elements.rootA = document.querySelector('#root-a');
+        elements.rootB = document.querySelector('#root-b');
+        elements.nodeA = document.querySelector('#node-a');
+
+        const path = findRootPath(elements.rootA, elements.nodeA);
+        const foundNode = findNodeByPath(elements.rootB, path);
+        foundNode.style.border = '2px dashed green';
+      }
+
+      document.addEventListener('DOMContentLoaded', onReady, false);
+    </script>
+  </body>
+</html>
