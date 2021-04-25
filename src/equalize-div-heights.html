@@ -1,0 +1,62 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Equalize Div Heights</title>
+    <style>
+      div {
+        width: 100px;
+        background: green;
+        margin-right: 10px;
+        display: inline-block;
+      }
+    </style>
+  </head>
+  <body>
+    <div style="height: 200px"></div>
+    <div style="height: 300px"></div>
+    <div style="height: 150px;"></div>
+    <button id="button">Equalize div height!</button>
+
+    <script>
+      function getHeighest(divs) {
+        let heighest = -Infinity;
+        let node = null;
+
+        for (const div of divs) {
+          const height = parseInt(div.style.height, 10);
+
+          if (height > heighest) {
+            heighest = height;
+            node = div;
+          }
+        }
+
+        return [node, heighest];
+      }
+
+      function equalizeDivHeight(divs) {
+        const [heighestDiv, heighestValue] = getHeighest(divs);
+
+        for (const div of divs) {
+          if (div !== heighestDiv) {
+            div.style.height = `${heighestValue}px`;
+          }
+        }
+      }
+
+      function onReady() {
+        const elements = {};
+        elements.button = document.querySelector('#button');
+        elements.divs = document.querySelectorAll('div');
+
+        function onClick() {
+          equalizeDivHeight(elements.divs);
+        }
+
+        elements.button.addEventListener('click', onClick, false);
+      }
+
+      document.addEventListener('DOMContentLoaded', onReady, false);
+    </script>
+  </body>
+</html>
