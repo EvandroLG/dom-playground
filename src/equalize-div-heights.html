@@ -30,12 +30,23 @@
     <button id="button">Equalize div height!</button>
 
     <script>
-      function getHeighest(divs) {
+      function getHeighest(divs, store) {
+        if (typeof store.heighest === 'string') {
+          console.log('from cache');
+
+          return [
+            store.heighestElement,
+            store.heighest
+          ];
+        }
+
         let heighest = -Infinity;
         let node = null;
 
         for (const div of divs) {
-          const height = getComputedStyle(div).height.replace('px', '');
+          const initialHeight = getComputedStyle(div).height;
+          store.elements.set(div, initialHeight);
+          const height = initialHeight.replace('px', '');
 
           if (height > heighest) {
             heighest = height;
@@ -43,11 +54,14 @@
           }
         }
 
+        store.heighest = heighest;
+        store.heighestElement = node;
+
         return [node, heighest];
       }
 
-      function equalizeDivHeight(divs) {
-        const [heighestDiv, heighestValue] = getHeighest(divs);
+      function equalizeDivHeight(divs, store) {
+        const [heighestDiv, heighestValue] = getHeighest(divs, store);
 
         for (const div of divs) {
           if (div !== heighestDiv) {
@@ -56,13 +70,42 @@
         }
       }
 
+      function resetDivHeight(divs, domStore) {
+        for (const div of divs) {
+          div.style.height = domStore.get(div);
+        }
+      }
+
       function onReady() {
         const elements = {};
         elements.button = document.querySelector('#button');
         elements.divs = document.querySelectorAll('div');
 
+        const store = {
+          heighest: null,
+          heighestElement: null,
+          elements: new Map(),
+        };
+
+        const states = {
+          isEqualized: false,
+        };
+
+        const texts = {
+          initial: elements.button.textContent,
+          reset: 'Reset heights'
+        };
+
         function onClick() {
-          equalizeDivHeight(elements.divs);
+          if (states.isEqualized) {
+            resetDivHeight(elements.divs, store.elements);
+            states.isEqualized = false;
+            elements.button.textContent = texts.initial;
+          } else {
+            equalizeDivHeight(elements.divs, store);
+            states.isEqualized = true;
+            elements.button.textContent = texts.reset;
+          }
         }
 
         elements.button.addEventListener('click', onClick, false);
