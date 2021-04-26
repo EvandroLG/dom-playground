@@ -1,0 +1,149 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Infinite Scroll Using Scroll Event</title>
+    <style>
+      .post img {
+        width: 300px;
+        height: 300px;
+        object-fit: cover;
+      }
+
+      footer {
+        height: 20px;
+      }
+
+      .go-back {
+        display: none;
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <header id="header">
+      <h1>Header</h1>
+    </header>
+    <main id="main"></main>
+    <footer id="footer"></footer>
+    <script>
+      function getRandomImages() {
+        const images = [
+          'https://media.gettyimages.com/photos/world-cup-brazil-picture-id977992276?s=2048x2048',
+          'https://media.gettyimages.com/photos/lets-dance-all-our-troubles-away-picture-id921837638?s=2048x2048',
+          'https://media.gettyimages.com/photos/brazilian-kid-playing-soccer-in-the-street-picture-id982137146?s=2048x2048',
+        ];
+        const idx = Math.floor(Math.random() * images.length);
+
+        return images[idx];
+      }
+
+      function getIndex(i) {
+        const idx = Math.floor(Math.random() * 100000);
+        return (''+idx).padStart(2, '0');
+      }
+
+      function loadImages(main, size) {
+        const elements = {};
+        elements.fragment = document.createDocumentFragment();
+        elements.post = document.createElement('div');
+        elements.post.classList.add('post');
+        elements.image = document.createElement('img');
+        elements.title = document.createElement('h2');
+        elements.description = document.createElement('p');
+
+        for (let i = 0; i < size; i++) {
+          const src = getRandomImages();
+          const index = getIndex();
+          const image = elements.image.cloneNode(false);
+          const title = elements.title.cloneNode(false);
+          const description = elements.description.cloneNode(false);
+          const post = elements.post.cloneNode(false);
+
+          image.setAttribute('src', src);
+          title.textContent = `Title ${index}`;
+          description.textContent = `Description ${index}`;
+
+          post.appendChild(title);
+          post.appendChild(image);
+          post.appendChild(description);
+
+          elements.fragment.appendChild(post);
+        }
+
+        main.appendChild(elements.fragment);
+      }
+
+      function throttle(fn, time) {
+        let timeoutId = null;
+
+        return (...args) => {
+          if (timeoutId) {
+            return;
+          }
+
+          timeoutId = setTimeout(() => {
+            fn.apply(this, args);
+            timeoutId = null;
+          });
+        };
+      }
+
+      function isElementVisible(element) {
+        const rect = element.getBoundingClientRect();
+
+        return (
+          rect.top >= 0 &&
+          rect.left >= 0 &&
+          rect.bottom <= window.innerHeight &&
+          rect.right <= window.innerWidth
+        );
+      }
+
+      function createGoBack() {
+        const elements = {};
+        elements.goBack = document.createElement('a');
+        elements.goBack.setAttribute('href', '#header');
+        elements.goBack.classList.add('go-back');
+        elements.goBack.textContent = 'Go back!';
+
+        function onClick(e) {
+          e.preventDefault();
+          window.scrollTo(0, 0);
+        }
+
+        elements.goBack.addEventListener('click', onClick, false);
+
+        return elements.goBack;
+      }
+
+      function onReady() {
+        const elements = {};
+        elements.header = document.querySelector('#header');
+        elements.main = document.querySelector('#main');
+        elements.goBack = createGoBack();
+        elements.footer = document.querySelector('#footer');
+
+        function onScroll() {
+          if (isElementVisible(elements.header)) {
+            elements.goBack.style.display = 'none';
+          } else {
+            elements.goBack.style.display = 'block';
+          }
+
+          if (isElementVisible(elements.footer)) {
+            loadImages(elements.main, 10);
+          }
+        }
+
+        window.addEventListener('scroll', throttle(onScroll, 300), false);
+
+        loadImages(elements.main, 15);
+        document.body.appendChild(elements.goBack);
+      }
+
+      document.addEventListener('DOMContentLoaded', onReady, false);
+    </script>
+  </body>
+</html>
