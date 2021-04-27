@@ -1,0 +1,79 @@
+<!doctype html>
+<html>
+  <head>
+    <title>
+      Basic Animation Using RequestAnimationFrame
+    </title>
+    <style>
+      .box {
+        width: 100px;
+        height: 100px;
+        background: blue;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="box" id="box"></div>
+    <button id="button">Animate</button>
+    <script>
+      function EventEmitter() {
+        const events = {};
+
+        return {
+          listener(eventName, callback) {
+            events[eventName] = callback;
+          },
+
+          emit(eventName, ...args) {
+            if (eventName in events) {
+              events[eventName].apply(this, args);
+            }
+          }
+        }
+      }
+
+      function animateElement(element, emitter) {
+        const start = performance.now();
+        const rect = element.getBoundingClientRect();
+        const limit = document.body.clientWidth - rect.width;
+
+        function animate(timestamp) {
+          const elapsed = timestamp - start;
+          const move = Math.min(elapsed * 0.3, limit);
+
+          element.style.transform = `translateX(${move}px)`;
+
+          if (move < limit) {
+            requestAnimationFrame(animate);
+          } else {
+            emitter.emit('animationEnd');
+          }
+        }
+
+        requestAnimationFrame(animate);
+      }
+
+      function onReady() {
+        const emitter = EventEmitter();
+        const elements = {};
+        elements.box = document.querySelector('#box');
+        elements.button = document.querySelector('#button');
+
+        emitter.listener('animationEnd', () => {
+          console.log('finished');
+          elements.button.removeAttribute('disabled');
+        });
+
+
+        function onClick() {
+          animateElement(elements.box, emitter);
+          elements.button.setAttribute('disabled', 'disabled');
+        }
+
+        elements.button.addEventListener('click', onClick, false);
+      }
+
+      document.addEventListener('DOMContentLoaded', onReady, false);
+    </script>
+  </body>
+</html>
