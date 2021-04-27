@@ -1,0 +1,48 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Input Mask</title>
+  </head>
+  <body>
+    <input type="text" id="date-field">
+
+    <script>
+      function dateMask(input) {
+        const combinator = '/';
+
+        function formatDateInput(input) {
+          const { value } = input;
+
+          input.value = value.split('').slice(0, 10).reduce((acc) => {
+            acc = acc.replace(/\D/g, '');
+
+            if (acc.length > 2) {
+              acc = `${acc.slice(0, 2)}${combinator}${acc.slice(2)}`;
+            }
+
+            if (acc.length > 5) {
+              acc = `${acc.slice(0, 5)}${combinator}${acc.slice(5)}`;
+            }
+
+            return acc.slice(0, 10);
+          }, value);
+        }
+
+        function onInput(e) {
+          formatDateInput(e.target);
+        }
+
+        input.addEventListener('input', onInput, false);
+      }
+
+      function onReady() {
+        const elements = {};
+        elements.dateField = document.querySelector('#date-field');
+
+        dateMask(elements.dateField);
+      }
+
+      document.addEventListener('DOMContentLoaded', onReady, false);
+    </script>
+  </body>
+</html>
