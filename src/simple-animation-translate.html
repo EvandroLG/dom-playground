@@ -24,7 +24,8 @@
           return;
         }
 
-        const move = document.body.clientWidth - element.offsetWidth;
+        const rect = element.getBoundingClientRect();
+        const move = document.body.clientWidth - rect.width;
         element.style.transform = `translateX(${move}px)`;
       }
 
