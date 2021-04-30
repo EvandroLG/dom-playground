@@ -1,0 +1,55 @@
+<!doctype html>
+<html>
+  <head>
+    <title>
+      Depth First DOM Traversal
+    </title>
+    <style>
+      div {
+        border: 1px solid green;
+        padding: 50px;
+        margin: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="a">
+      <div class="a1">
+        <div class="a11"></div>
+        <div class="a12"></div>
+      </div>
+      <div class="a2">
+        <div class="a21"></div>
+        <div class="a22"></div>
+      </div>
+    </div>
+    <div id="result"></div>
+
+    <script>
+      function traverse(root) {
+        const visited = [];
+
+        (function traverseHelper(node) {
+          visited.push(node);
+
+          for (const child of node.children) {
+            traverseHelper(child);
+          }
+        })(root);
+
+        return visited;
+      }
+
+      function onReady() {
+        const elements = {};
+        elements.root = document.querySelector('.a');
+        elements.result = document.querySelector('#results')
+
+        const nodes = traverse(elements.root);
+        elements.result.textContent = nodes.map((node) => node.classList.value).join(' - ');
+      }
+
+      document.addEventListener('DOMContentLoaded', onReady, false);
+    </script>
+  </body>
+</html>
