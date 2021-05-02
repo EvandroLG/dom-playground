@@ -1,0 +1,100 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Search table</title>
+    <style>
+      .off {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <main id="main"></main>
+
+    <script>
+      function getRandomId() {
+        return Math.floor(
+          Math.random() * 100000
+        );
+      }
+
+      function debounce(fn, time) {
+        let timeoutId = null;
+
+        return (...args) => {
+          if (timeoutId) {
+            clearTimeout(timeoutId);
+            timeoutId = null;
+          }
+
+          const ctx = this;
+
+          timeoutId = setTimeout(() => {
+            fn.apply(ctx, args);
+            timeoutId = null;
+          }, time);
+        };
+      }
+
+      function createSearch(table) {
+        const elements = {};
+        elements.inputSearch = document.createElement('input');
+        elements.inputSearch.setAttribute('type', 'search');
+        elements.inputSearch.setAttribute('placeholder', 'Search...');
+
+        function onInput(e) {
+          const value = e.target.value.toLowerCase();
+
+          console.time();
+          for (const child of table.children) {
+            const td = child.querySelector('td');
+
+            if (!td.textContent.toLowerCase().includes(value)) {
+              child.classList.add('off');
+            } else {
+              child.classList.remove('off');
+            }
+          }
+          console.timeEnd();
+        }
+
+        elements.inputSearch.addEventListener('input', debounce(onInput, 500), false);
+
+        return elements.inputSearch;
+      }
+
+      function createTable() {
+        const elements = {};
+        elements.table = document.createElement('table');
+        elements.tr = document.createElement('tr');
+        elements.td = document.createElement('td');
+
+        for (let i = 0; i < 1000; i++) {
+          const tr = elements.tr.cloneNode();
+          const td = elements.td.cloneNode();
+          const id = getRandomId();
+
+          td.textContent = `Text ${id}`;
+          tr.appendChild(td);
+          elements.table.appendChild(tr);
+        }
+
+        return elements.table;
+      }
+
+      function onReady() {
+        const elements = {};
+        elements.main = document.querySelector('#main');
+        elements.fragment = document.createDocumentFragment();
+        elements.table = createTable();
+        elements.search = createSearch(elements.table);
+
+        elements.fragment.appendChild(elements.search);
+        elements.fragment.appendChild(elements.table);
+        elements.main.appendChild(elements.fragment);
+      }
+
+      document.addEventListener('DOMContentLoaded', onReady, false);
+    </script>
+  </body>
+</html>
