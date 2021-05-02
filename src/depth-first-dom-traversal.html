@@ -43,7 +43,7 @@
       function onReady() {
         const elements = {};
         elements.root = document.querySelector('.a');
-        elements.result = document.querySelector('#results')
+        elements.result = document.querySelector('#result');
 
         const nodes = traverse(elements.root);
         elements.result.textContent = nodes.map((node) => node.classList.value).join(' - ');
