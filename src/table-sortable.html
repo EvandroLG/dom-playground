@@ -1,0 +1,145 @@
+<!doctype html>
+<html>
+  <head>
+    <title>
+      Table Sortable
+    </title>
+    <style>
+      .off {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <main id="main"></main>
+    <script>
+      const data = [
+        {
+          language: 'Lua',
+          year: 1993
+        },
+
+        {
+          language: 'Python',
+          year: 1991
+        },
+
+        {
+          language: 'JavaScript',
+          year: 1996
+        },
+
+        {
+          language: 'Ruby',
+          year: 1995
+        },
+
+        {
+          language: 'C',
+          year: 1972
+        },
+      ];
+
+      function populateData(data, elements) {
+        for (const item of data) {
+          const { language } = item;
+          const { year } = item;
+
+          const tr = elements.tr.cloneNode(false);
+          const tdLanguage = elements.td.cloneNode(false);
+          const tdYear = elements.td.cloneNode(false);
+
+          tdLanguage.textContent = language;
+          tdYear.textContent = year;
+
+          tr.appendChild(tdLanguage);
+          tr.appendChild(tdYear);
+          elements.tbody.appendChild(tr);
+        }
+      }
+
+      function removeChildren(element) {
+        while (element.lastChild) {
+          element.lastChild.remove();
+        }
+      }
+
+      function createTable(data) {
+        const states = {
+          isAsceding: false,
+        };
+
+        const elements = {};
+        elements.table = document.createElement('table');
+        elements.thead = document.createElement('thead');
+        elements.tr = document.createElement('tr');
+        elements.th = document.createElement('th');
+        elements.tbody = document.createElement('tbody');
+        elements.td = document.createElement('td');
+
+        function handleSortTable(field, data, isAsceding = true) {
+          const copiedData = data.slice();
+
+          copiedData.sort((a, b) => {
+            if (typeof a[field] === 'string' && typeof b[field] === 'string') {
+              if (a[field] < b[field]) {
+                return -1;
+              }
+
+              if (a[field] > b[field]) {
+                return 1;
+              }
+
+              return 0;
+            }
+
+            return a[field] - b[field];
+          });
+
+          elements.tbody.classList.add('off');
+          removeChildren(elements.tbody);
+          populateData(isAsceding ? copiedData : copiedData.reverse(), elements);
+          elements.tbody.classList.remove('off');
+        }
+
+        function onClick(e) {
+          const element = e.target;
+
+          if (element.matches('th')) {
+            states.isAsceding = !states.isAsceding;
+            handleSortTable(element.dataset.type, data, states.isAsceding);
+          }
+        }
+
+        elements.table.addEventListener('click', onClick, false);
+        populateData(data, elements);
+
+        const thLanguage = elements.th.cloneNode();
+        thLanguage.textContent = 'Language';
+        thLanguage.dataset.type = 'language';
+        const thYear = elements.th.cloneNode();
+        thYear.dataset.type = 'year';
+        thYear.textContent = 'Year';
+
+        elements.tr.appendChild(thLanguage);
+        elements.tr.appendChild(thYear);
+        elements.thead.appendChild(elements.tr);
+
+        elements.table.appendChild(elements.thead);
+        elements.table.appendChild(elements.tbody);
+
+        return elements.table;
+      }
+
+      function onReady() {
+        const elements = {};
+        elements.main = document.querySelector('#main');
+        elements.table = createTable(data);
+
+        elements.main.appendChild(elements.table);
+      }
+
+      document.addEventListener('DOMContentLoaded', onReady, false);
+    </script>
+  </body>
+</html>

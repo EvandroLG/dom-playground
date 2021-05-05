@@ -47,6 +47,7 @@
 
           console.time();
           table.classList.add('off');
+
           for (const child of table.children) {
             const td = child.querySelector('td');
 
@@ -56,6 +57,7 @@
               child.classList.remove('off');
             }
           }
+
           table.classList.remove('off');
           console.timeEnd();
         }
