@@ -14,26 +14,29 @@
   <body>
     <div class="ball"></div>
     <script>
-      function animate(element, limit) {
+      function animate(element, limit, duration) {
+        let start = performance.now();
         let goRight = true;
-        let move = 0;
+        let amountToMove = 0;
 
-        function animateHelper() {
-          if (move === 0) {
+        function animateHelper(now) {
+          if (amountToMove === 0) {
+            start = performance.now();
             goRight = true;
           }
 
-          if (move === limit) {
+          if (amountToMove === limit) {
+            start = performance.now();
             goRight = false;
           }
 
-          if (goRight) {
-            move = Math.min(move + 5, limit);
-          } else {
-            move = Math.max(move - 5, 0);
-          }
+          const elapsed = now - start;
+          const progress = elapsed / duration;
+          const move = Math.min(progress * limit, limit);
+          amountToMove = goRight ? move : limit - move;
 
-          element.style.transform = `translateX(${move}px) rotate(${move}deg)`
+          element.style.transform = `translateX(${amountToMove}px) rotate(${amountToMove}deg)`
+
           requestAnimationFrame(animateHelper);
         }
 
@@ -48,7 +51,7 @@
         const rect = elements.ball.getBoundingClientRect();
         const limit = elements.body.clientWidth - rect.width
 
-        animate(elements.ball, limit);
+        animate(elements.ball, limit, 3000);
       }
 
       document.addEventListener('DOMContentLoaded', onReady, false);
