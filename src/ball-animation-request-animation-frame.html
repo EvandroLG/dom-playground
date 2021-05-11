@@ -1,0 +1,57 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Ball Animation</title>
+    <style>
+      .ball {
+        background: url('https://secureservercdn.net/166.62.108.196/a7w.8b4.myftpupload.com/wp-content/uploads/2020/05/i.png');
+        background-size: cover;
+        width: 100px;
+        height: 100px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="ball"></div>
+    <script>
+      function animate(element, limit) {
+        let goRight = true;
+        let move = 0;
+
+        function animateHelper() {
+          if (move === 0) {
+            goRight = true;
+          }
+
+          if (move === limit) {
+            goRight = false;
+          }
+
+          if (goRight) {
+            move = Math.min(move + 5, limit);
+          } else {
+            move = Math.max(move - 5, 0);
+          }
+
+          element.style.transform = `translateX(${move}px) rotate(${move}deg)`
+          requestAnimationFrame(animateHelper);
+        }
+
+        requestAnimationFrame(animateHelper);
+      }
+
+      function onReady() {
+        const elements = {};
+        elements.ball = document.querySelector('.ball');
+        elements.body = document.body;
+
+        const rect = elements.ball.getBoundingClientRect();
+        const limit = elements.body.clientWidth - rect.width
+
+        animate(elements.ball, limit);
+      }
+
+      document.addEventListener('DOMContentLoaded', onReady, false);
+    </script>
+  </body>
+</html>
