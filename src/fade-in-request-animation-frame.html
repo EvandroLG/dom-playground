@@ -1,0 +1,56 @@
+<!doctype html>
+<html>
+  <head>
+    <title>FadeIn</title>
+    <style>
+      .box {
+        opacity: 0;
+        background: red;
+        width: 100px;
+        height: 100px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="box"></div>
+    <button>Click me</button>
+    <script>
+      function fadeIn(element) {
+        let start = performance.now();
+        let opacity = 0;
+
+        function animate(now) {
+          const elapsed = now - start;
+
+          if (elapsed >= 80) {
+            opacity = opacity + 0.1;
+            element.style.opacity = opacity;
+            start = performance.now();
+          }
+
+          if (Math.floor(opacity) >= 1) {
+            return;
+          }
+
+          requestAnimationFrame(animate);
+        }
+
+        requestAnimationFrame(animate);
+      }
+
+      function onReady() {
+        const elements = {};
+        elements.box = document.querySelector('.box');
+        elements.button = document.querySelector('button');
+
+        function onClick() {
+          fadeIn(elements.box);
+        }
+
+        elements.button.addEventListener('click', onClick, false);
+      }
+
+      document.addEventListener('DOMContentLoaded', onReady, false);
+    </script>
+  </body>
+</html>
