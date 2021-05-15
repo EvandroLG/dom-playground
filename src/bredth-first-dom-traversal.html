@@ -1,0 +1,56 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Breadth First DOM Traversal</title>
+    <style>
+      div {
+        border: 1px solid green;
+        padding: 50px;
+        margin: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="a">
+      <div class="a1">
+        <div class="a11"></div>
+        <div class="a12"></div>
+      </div>
+      <div class="a2">
+        <div class="a21"></div>
+        <div class="a22"></div>
+      </div>
+    </div>
+    <div id="result"></div>
+
+    <script>
+      function traverse(root) {
+        const queue = [root];
+        const output = [];
+
+        while (queue.length) {
+          const element = queue.shift();
+          output.push(element);
+          const children = [...element.children];
+
+          for (const child of children) {
+            queue.push(child);
+          }
+        }
+
+        return output;
+      }
+
+      function onReady() {
+        const elements = {};
+        elements.root = document.querySelector('.a');
+        elements.result = document.querySelector('#result');
+
+        const path = traverse(elements.root);
+        elements.result.textContent = path.map(element => element.className).join(' - ');
+      }
+
+      document.addEventListener('DOMContentLoaded', onReady, false);
+    </script>
+  </body>
+</html>
