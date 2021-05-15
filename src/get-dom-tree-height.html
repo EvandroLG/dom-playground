@@ -1,0 +1,45 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Get DOM Tree Height</title>
+  </head>
+  <body>
+    <div>
+      <div>
+        <p>
+        <button>Hello</button>
+        </p>
+      </div>
+      <p>
+      <span>World!</span>
+      </p>
+    </div>
+
+    <script>
+      function getHeight(root) {
+        if (!root) {
+          return 0;
+        }
+
+        const children = [...root.children];
+        let height = 0;
+
+        for (const child of children) {
+          height = Math.max(height, getHeight(child));
+        }
+
+        return 1 + height;
+      }
+
+      function onReady() {
+        const elements = {};
+        elements.root = document.querySelector('div');
+        console.log(
+          getHeight(elements.root)
+        );
+      }
+
+      document.addEventListener('DOMContentLoaded', onReady, false);
+    </script>
+  </body>
+</html>
