@@ -38,9 +38,7 @@
 
         let current = target.parentElement;
 
-        while (current) {
-          current = getNextRightSibling(root, current);
-
+        while (current = getNextRightSibling(root, current)) {
           if (current.firstElementChild) {
             return current.firstElementChild;
           }
