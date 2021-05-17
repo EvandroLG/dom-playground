@@ -1,0 +1,65 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Get Next Right Sibling</title>
+  </head>
+  <body>
+    <div id="root">
+      <div>
+        <p>
+          <a></a>
+        </p>
+        <p>
+          <button id="target"></button>
+        </p>
+      </div>
+
+      <div>
+        <p></p>
+      </div>
+
+      <div>
+        <p>
+          <a id="next"></a>
+          <a></a>
+        </p>
+      </div>
+    </div>
+
+    <script>
+      function getNextRightSibling(root, target) {
+        if (!target) {
+          return null;
+        }
+
+        if (target.nextElementSibling) {
+          return target.nextElementSibling;
+        }
+
+        let current = target.parentElement;
+
+        while (current) {
+          current = getNextRightSibling(root, current);
+
+          if (current.firstElementChild) {
+            return current.firstElementChild;
+          }
+        }
+
+        return null;
+      }
+
+      function onReady() {
+        const elements = {};
+        elements.root = document.querySelector('#root');
+        elements.target = document.querySelector('#target');
+
+        console.log(
+          getNextRightSibling(elements.root, elements.target)
+        );
+      }
+
+      document.addEventListener('DOMContentLoaded', onReady, false);
+    </script>
+  </body>
+</html>
