@@ -1,0 +1,55 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Implementation of getElementsByTagName</title>
+  </head>
+  <body>
+    <div id="root">
+      <div id="a">
+        <span id="a1"></span>
+        <div id="a2"></div>
+      </div>
+      <div id="b">
+        <div id="b1"></div>
+        <div id="b2"></div>
+        <div id="b3">
+          <div id="b4">
+            <span id="b5"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="result"></div>
+
+    <script>
+      function byTagName(tree, tagName) {
+        return (function byTagNameHelper(root, result) {
+          if (!root) {
+            return;
+          }
+
+          const children = [...root.children];
+
+          for (const child of children) {
+            if (child.nodeName.toLowerCase() === tagName) {
+              result.push(child);
+            }
+
+            byTagNameHelper(child, result);
+          }
+
+          return result;
+        })(tree, []);
+      }
+
+      function onReady() {
+        const elements = byTagName(document.querySelector('#root'), 'div');
+        const ids = elements.map(element => element.id).join(' - ');
+        document.querySelector('#result').textContent = ids;
+      }
+
+      document.addEventListener('DOMContentLoaded', onReady, false);
+    </script>
+  </body>
+</html>
