@@ -45,7 +45,7 @@
         const elements = {};
         elements.root = byClassName(undefined, 'root')[0];
         elements.result = byClassName(undefined, 'result')[0];
-        elements.result.textContent = byClassName(elements.root, 'a').map(item => item.id);
+        elements.result.textContent = byClassName(elements.root, 'a').map(item => item.id).join(', ');
       }
 
       document.addEventListener('DOMContentLoaded', onReady, false);
