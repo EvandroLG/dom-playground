@@ -24,30 +24,27 @@
 
     <script>
       function byClassName(root, className) {
-        return (function byClassNameHelper(element, result = []) {
-          if (!element) {
-            return;
+        const stack = [root ? root : document.body];
+        const result = [];
+
+        while (stack.length) {
+          const node = stack.pop();
+
+          if (node.classList.contains(className)) {
+            result.push(node);
           }
 
-          const children = [...element.children];
+          const children = [...node.children].reverse();
+          stack.push(...children);
+        }
 
-          for (const child of children) {
-            if (child.classList.contains(className)) {
-              result.push(child);
-            }
-
-            byClassNameHelper(child, result);
-          }
-
-          return result;
-        })(root ? root : document.body);
+        return result;
       }
 
       function onReady() {
         const elements = {};
         elements.root = byClassName(undefined, 'root')[0];
         elements.result = byClassName(undefined, 'result')[0];
-
         elements.result.textContent = byClassName(elements.root, 'a').map(item => item.id);
       }
 
