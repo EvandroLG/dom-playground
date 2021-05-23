@@ -1,0 +1,62 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Draw Dots</title>
+    <style>
+      .dot {
+        border-radius: 50%;
+        width: 10px;
+        height: 10px;
+        background: #000;
+        position: absolute;
+      }
+    </style>
+  </head>
+  <body>
+    <button id="bt-reset">Reset</button>
+
+    <script>
+      function draw() {
+        const elements = {};
+        elements.body = document.body;
+        elements.div = document.createElement('div');
+
+        window.addEventListener('click', onClick, false);
+
+        function onClick(e) {
+          if (e.target.matches('#bt-reset')) {
+            return;
+          }
+
+          const div = elements.div.cloneNode(false);
+          div.classList.add('dot');
+          div.style.cssText = `
+            top: ${e.pageY - 4}px;
+            left: ${e.pageX - 4}px;
+          `;
+
+          elements.body.appendChild(div);
+        }
+      }
+
+      function reset() {
+        document.querySelector('#bt-reset').addEventListener('click', onClick, false);
+
+        function onClick(e) {
+          const dots = document.querySelectorAll('.dot');
+
+          for (const dot of dots) {
+            dot.remove();
+          }
+        }
+      }
+
+      function onReady() {
+        draw();
+        reset();
+      }
+
+      document.addEventListener('DOMContentLoaded', onReady, false);
+    </script>
+  </body>
+</html>
