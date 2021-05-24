@@ -1,0 +1,56 @@
+<!doctype html>
+<html>
+  <head>
+    <title>findElementsByText</title>
+  </head>
+  <body>
+    <div>
+      <div id="one">
+        finding elements by text
+        <div id="two">
+          finding elements by text
+        </div>
+      </div>
+      <div>
+        <h1>
+          <span>
+            <h3 id="three">finding elements by text</h3>
+          </span>
+        </h1>
+      </div>
+    </div>
+
+    <div id="result"></div>
+
+    <script>
+      function findElementsByText(value) {
+        const allElements = document.querySelectorAll('*');
+        const excludes = new Set(['html', 'head', 'style', 'title', 'link', 'meta', 'script', 'object', 'iframe']);
+        const filteredElements = Array.from(allElements).filter(element => {
+          return !excludes.has(element.tagName.toLowerCase());
+        });
+
+        const result = [];
+
+        for (const element of filteredElements) {
+          const children = Array.from(element.childNodes);
+
+          for (const child of children) {
+            if (child.nodeType === Node.TEXT_NODE && child.textContent.trim() === value) {
+              result.push(child.parentElement);
+            }
+          }
+        }
+
+        return result;
+      }
+
+      function onReady() {
+        const nodes = findElementsByText('finding elements by text');
+        document.querySelector('#result').textContent = nodes.map(node => node.id).join(' - ');
+      }
+
+      document.addEventListener('DOMContentLoaded', onReady, false);
+    </script>
+  </body>
+</html>
