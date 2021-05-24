@@ -36,7 +36,7 @@
           const children = Array.from(element.childNodes);
 
           for (const child of children) {
-            if (child.nodeType === Node.TEXT_NODE && child.textContent.trim() === value) {
+            if (child.nodeType === Node.TEXT_NODE && child.nodeValue.trim() === value) {
               result.push(child.parentElement);
             }
           }
