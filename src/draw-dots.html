@@ -43,11 +43,13 @@
         document.querySelector('#bt-reset').addEventListener('click', onClick, false);
 
         function onClick(e) {
+          console.time();
           const dots = document.querySelectorAll('.dot');
 
           for (const dot of dots) {
             dot.remove();
           }
+          console.timeEnd();
         }
       }
 
