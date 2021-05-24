@@ -16,8 +16,7 @@
     <button>Click me</button>
     <script>
       function fadeIn(element, duration) {
-        let start = performance.now();
-        let opacity = 0;
+        const start = performance.now();
 
         function animate(now) {
           const elapsed = now - start;
