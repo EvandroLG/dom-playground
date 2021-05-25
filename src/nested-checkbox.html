@@ -1,0 +1,83 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Nested Checkbox</title>
+    <style>
+      .checkbox-container {
+        margin-left: 20px;
+        margin-bottom: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="checkbox-container" id="container">
+      <label for="brazil">Brazil</label>
+      <input type="checkbox" id="brazil">
+
+      <div class="checkbox-container">
+        <label for="rs">Rio Grande do Sul</label>
+        <input type="checkbox" id="rs">
+          <div class="checkbox-container">
+            <label for="porto-alegre">Porto Alegre</label>
+            <input type="checkbox" id="porto-alegre">
+
+            <label for="pelotas">Pelotas</label>
+            <input type="checkbox" id="pelotas">
+          </div>
+      </div>
+
+      <div class="checkbox-container">
+        <label for="rj">Rio de Janeiro</label>
+        <input type="checkbox" id="rj">
+          <div class="checkbox-container">
+            <label for="rj-city">Rio de Janeiro</label>
+            <input type="checkbox" id="rj-city">
+
+            <label for="parati">Parati</label>
+            <input type="checkbox" id="parati">
+
+            <label for="buzios">Buzios</label>
+            <input type="checkbox" id="buzios">
+          </div>
+      </div>
+    </div>
+
+    <script>
+      function delegate(root, selector, eventType, callback) {
+        function handler(e) {
+          const element = e.target;
+
+          if (element.matches(selector)) {
+            callback.apply(element, [e]);
+          }
+        }
+
+        root.addEventListener(eventType, handler);
+      }
+
+      function onReady() {
+        const elements = {};
+        elements.container = document.querySelector('#container');
+
+        function onInput(e) {
+          const element = e.target;
+          const isChecked = element.checked;
+          const parentElement = element.parentElement;
+          const containers = parentElement.querySelectorAll('.checkbox-container');
+
+          for (const container of containers) {
+            const checkboxes = container.querySelectorAll('input[type="checkbox"]');
+
+            for (const checkbox of checkboxes) {
+              checkbox.checked = isChecked;
+            }
+          }
+        }
+
+        delegate(elements.container, 'input[type="checkbox"]', 'input', onInput);
+      }
+
+      document.addEventListener('DOMContentLoaded', onReady, false);
+    </script>
+  </body>
+</html>
