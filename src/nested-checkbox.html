@@ -55,6 +55,26 @@
         root.addEventListener(eventType, handler);
       }
 
+      function updateParent(element, isChecked) {
+        if (isChecked) {
+          return;
+        }
+
+        if (!element) {
+          return;
+        }
+
+        const children = element.children;
+
+        for (const child of children) {
+          if (child.matches('input[type="checkbox"]')) {
+            child.checked = false;
+          }
+        }
+
+        updateParent(element.parentElement, isChecked);
+      }
+
       function onReady() {
         const elements = {};
         elements.container = document.querySelector('#container');
@@ -63,6 +83,11 @@
           const element = e.target;
           const isChecked = element.checked;
           const parentElement = element.parentElement;
+
+          if (parentElement.parentElement) {
+            updateParent(parentElement.parentElement, isChecked);
+          }
+
           const containers = parentElement.querySelectorAll('.checkbox-container');
 
           for (const container of containers) {
