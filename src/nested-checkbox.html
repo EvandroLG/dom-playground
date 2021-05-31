@@ -55,16 +55,34 @@
         root.addEventListener(eventType, handler);
       }
 
-      function updateParent(element, isChecked) {
-        if (isChecked) {
-          return;
-        }
-
-        if (!element) {
-          return;
-        }
-
+      function isAllChecked(element) {
         const children = element.children;
+
+        for (const child of children) {
+          if (child.matches('input[type="checkbox"]') && !child.checked) {
+            return false;
+          }
+        }
+
+        return true;
+      }
+
+      function updateParent(container, checkbox) {
+        const isChecked = checkbox.checked;
+
+        if (isChecked) {
+          if (isAllChecked(checkbox.parentElement)) {
+            container.querySelector('input[type="checkbox"]').checked = true;
+          }
+
+          return;
+        }
+
+        if (!container) {
+          return;
+        }
+
+        const children = container.children;
 
         for (const child of children) {
           if (child.matches('input[type="checkbox"]')) {
@@ -72,7 +90,7 @@
           }
         }
 
-        updateParent(element.parentElement, isChecked);
+        updateParent(container.parentElement, checkbox);
       }
 
       function onReady() {
@@ -85,7 +103,7 @@
           const parentElement = element.parentElement;
 
           if (parentElement.parentElement) {
-            updateParent(parentElement.parentElement, isChecked);
+            updateParent(parentElement.parentElement, element);
           }
 
           const containers = parentElement.querySelectorAll('.checkbox-container');
