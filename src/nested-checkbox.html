@@ -67,14 +67,31 @@
         return true;
       }
 
+      function updateParentWhenChecked(containerParent) {
+        if (!containerParent) {
+          return;
+        }
+
+        const containers = containerParent.querySelectorAll('.checkbox-container');
+        let isChecked = true;
+
+        for (const container of containers) {
+          if (!isAllChecked(container)) {
+            isChecked = false;
+            break;
+          }
+        }
+
+        containerParent.querySelector('input[type="checkbox"]').checked = isChecked;
+
+        updateParentWhenChecked(containerParent.parentElement);
+      }
+
       function updateParent(container, checkbox) {
         const isChecked = checkbox.checked;
 
         if (isChecked) {
-          if (isAllChecked(checkbox.parentElement)) {
-            container.querySelector('input[type="checkbox"]').checked = true;
-          }
-
+          updateParentWhenChecked(container);
           return;
         }
 
@@ -113,7 +130,7 @@
           const element = e.target;
           const parentElement = element.parentElement;
 
-          if (parentElement.parentElement) {
+          if (parentElement !== elements.container && parentElement.parentElement) {
             updateParent(parentElement.parentElement, element);
           }
 
