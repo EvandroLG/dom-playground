@@ -93,28 +93,31 @@
         updateParent(container.parentElement, checkbox);
       }
 
+      function updateChildren(parentElement, isChecked) {
+        const containers = parentElement.querySelectorAll('.checkbox-container');
+
+        for (const container of containers) {
+          const checkboxes = container.querySelectorAll('input[type="checkbox"]');
+
+          for (const checkbox of checkboxes) {
+            checkbox.checked = isChecked;
+          }
+        }
+      }
+
       function onReady() {
         const elements = {};
         elements.container = document.querySelector('#container');
 
         function onInput(e) {
           const element = e.target;
-          const isChecked = element.checked;
           const parentElement = element.parentElement;
 
           if (parentElement.parentElement) {
             updateParent(parentElement.parentElement, element);
           }
 
-          const containers = parentElement.querySelectorAll('.checkbox-container');
-
-          for (const container of containers) {
-            const checkboxes = container.querySelectorAll('input[type="checkbox"]');
-
-            for (const checkbox of checkboxes) {
-              checkbox.checked = isChecked;
-            }
-          }
+          updateChildren(parentElement, element.checked);
         }
 
         delegate(elements.container, 'input[type="checkbox"]', 'input', onInput);
