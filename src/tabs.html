@@ -53,9 +53,15 @@
           elements.fragment.appendChild(button);
         }
 
-        function onClick(e) {
-          const { target } = e;
-          const tabName = target.getAttribute('data-tabname');
+        debugger;
+        const urlSearch = new URLSearchParams(location.search);
+        const param = urlSearch.get('tabname');
+        showTab(param);
+
+        function showTab(tabName) {
+          if (!tabName) {
+            return;
+          }
 
           for (const content of elements.contents) {
             if (content.getAttribute('data-tabname') === tabName) {
@@ -64,6 +70,13 @@
               content.classList.add('off');
             }
           }
+        }
+
+        function onClick(e) {
+          const { target } = e;
+          const tabName = target.getAttribute('data-tabname');
+
+          showTab(tabName);
         }
 
         delegate('click', element, 'button[data-tabname]', onClick);
