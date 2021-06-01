@@ -1,0 +1,81 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Tabs</title>
+    <style>
+      .off {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <tab-panel>
+      <div data-tabname="one">
+        Tab one
+      </div>
+      <div data-tabname="two">
+        Tab two
+      </div>
+      <div data-tabname="three">
+        Tab three
+      </div>
+    </tab-panel>
+
+    <script>
+      function delegate(eventType, container, matches, callback) {
+        container.addEventListener(eventType, (e) => {
+          const { target } = e;
+
+          if (target.matches(matches)) {
+            callback.call(target, e);
+          }
+        }, false);
+      }
+
+      function asTabs(element) {
+        const elements = {};
+        elements.contents = Array.from(element.querySelectorAll('*[data-tabname]'));
+        elements.fragment = document.createDocumentFragment();
+        elements.button = document.createElement('button');
+
+        for (let i = 0; i < elements.contents.length; i++) {
+          const content = elements.contents[i];
+
+          if (i > 0) {
+            content.classList.add('off');
+          }
+
+          const button = elements.button.cloneNode(false);
+          const tabName = content.getAttribute('data-tabname');
+
+          button.setAttribute('data-tabname', tabName);
+          button.textContent = tabName;
+          elements.fragment.appendChild(button);
+        }
+
+        function onClick(e) {
+          const { target } = e;
+          const tabName = target.getAttribute('data-tabname');
+
+          for (const content of elements.contents) {
+            if (content.getAttribute('data-tabname') === tabName) {
+              content.classList.remove('off');
+            } else {
+              content.classList.add('off');
+            }
+          }
+        }
+
+        delegate('click', element, 'button[data-tabname]', onClick);
+
+        element.prepend(elements.fragment);
+      }
+
+      function onReady() {
+        asTabs(document.querySelector('tab-panel'));
+      }
+
+      document.addEventListener('DOMContentLoaded', onReady, false);
+    </script>
+  </body>
+</html>
