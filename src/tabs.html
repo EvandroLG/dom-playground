@@ -53,10 +53,7 @@
           elements.fragment.appendChild(button);
         }
 
-        debugger;
-        const urlSearch = new URLSearchParams(location.search);
-        const param = urlSearch.get('tabname');
-        showTab(param);
+        showTab(location.hash.slice(1));
 
         function showTab(tabName) {
           if (!tabName) {
@@ -75,6 +72,7 @@
         function onClick(e) {
           const { target } = e;
           const tabName = target.getAttribute('data-tabname');
+          history.pushState(null, null, `#${tabName}`);
 
           showTab(tabName);
         }
