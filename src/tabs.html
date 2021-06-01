@@ -77,6 +77,10 @@
           showTab(tabName);
         }
 
+        window.addEventListener('popstate', () => {
+          showTab(location.hash.slice(1));
+        });
+
         delegate('click', element, 'button[data-tabname]', onClick);
 
         element.prepend(elements.fragment);
