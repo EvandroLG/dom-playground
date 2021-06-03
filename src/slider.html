@@ -1,0 +1,152 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Slider</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+      }
+
+      .slider ul {
+        width: 100000px;
+        transition: transform 1s ease-in-out;
+      }
+
+      .slider li {
+        display: inline-block;
+      }
+    </style>
+  </head>
+  <body>
+    <main id="main"></main>
+
+    <script>
+      function request() {
+        const data = [
+          {
+            image: 'https://m.media-amazon.com/images/S/sonata-images-prod/DE_Hero_Lucifer_S5B_V2_Launch/442ab0de-d74f-460b-9df5-2d7b437c39bb._UR3000,600_SX1500_FMjpg_.jpeg',
+            title: 'Lucifer',
+            link: '#lucifer',
+          },
+          {
+            image: 'https://m.media-amazon.com/images/S/sonata-images-prod/DE_Hero_Panic_S1_Launch/0a5dd443-8383-4145-9a97-74c0c6ba980b._UR3000,600_SX1500_FMjpg_.jpeg',
+            title: 'Panic',
+            link: '#panic',
+          },
+          {
+            image: 'https://m.media-amazon.com/images/S/sonata-images-prod/DE_Hero_Call_Me_By_Your_Name_Launch/4829a9e7-29b6-4e16-8c3b-6dc8ab514ad3._UR3000,600_SX1500_FMjpg_.jpeg',
+            title: 'Call Me by Your Name',
+            link: '#call-me-by-your-name',
+          }
+        ];
+
+        return new Promise((resolve, reject) => {
+          setTimeout(() => {
+            resolve(data);
+          }, Math.floor(Math.random * 10000));
+        });
+      }
+
+      function delegate(eventType, container, pattern, callback) {
+        container.addEventListener(eventType, (e) => {
+          if (e.target.matches(pattern)) {
+            callback.call(e.target, e);
+          }
+        }, false);
+      }
+
+      class Slider {
+        constructor() {
+          this.elements = {};
+
+          this.clientWidth = document.body.clientWidth;
+          this.limit = null;
+          this.translateX = 0;
+          this.isAnimationRunning = false;
+        }
+
+        _transitionEnd() {
+          this.elements.ul.addEventListener('transitionend', () => {
+            this.isAnimationRunning = false;
+          }, false);
+        }
+
+        _onClick({ target }) {
+          if (this.isAnimationRunning) {
+            return;
+          }
+
+          if (target === this.elements.btNext) {
+            this.translateX += this.clientWidth * -1;
+            this.elements.ul.style.transform = `translateX(${this.translateX}px)`;
+            this.elements.btPrevious.removeAttribute('disabled');
+            this.translateX === this.limit && this.elements.btNext.setAttribute('disabled', true);
+          } else {
+            this.translateX += this.clientWidth;
+            this.elements.ul.style.transform = `translateX(${this.translateX}px)`;
+            this.elements.btNext.removeAttribute('disabled');
+            !this.translateX && this.elements.btPrevious.setAttribute('disabled', true);
+          }
+
+          this.isAnimationRunning = true;
+        }
+
+        async render() {
+          const data = await request();
+          this.limit = (data.length - 1) * this.clientWidth * -1;
+
+          this.elements.link = document.createElement('a');
+          this.elements.title = document.createElement('h2');
+          this.elements.image = new Image();
+          this.elements.button = document.createElement('button');
+          this.elements.btPrevious = this.elements.button.cloneNode(false);
+          this.elements.btNext = this.elements.button.cloneNode(false);
+          this.elements.container = document.createElement('div');
+          this.elements.ul = document.createElement('ul');
+          this.elements.li = document.createElement('li');
+          this.elements.li.style.width = `${this.clientWidth}px`;
+
+          for (const item of data) {
+            const li = this.elements.li.cloneNode(false);
+            const link = this.elements.link.cloneNode(false);
+            const title = this.elements.title.cloneNode(false);
+            const image = this.elements.image.cloneNode(false);
+
+            link.setAttribute('href', item.link);
+            title.textContent = item.title;
+            image.setAttribute('src', item.image);
+
+            link.append(title, image);
+            li.append(link);
+            this.elements.ul.append(li);
+          }
+
+          this.elements.container.classList.add('slider');
+          this.elements.btPrevious.setAttribute('disabled', 'disabled');
+          this.elements.btPrevious.setAttribute('data-button-type', 'previous');
+          this.elements.btNext.setAttribute('data-button-type', 'next');
+
+          this.elements.btPrevious.textContent = 'Previous';
+          this.elements.btNext.textContent = 'Next';
+
+          this._transitionEnd();
+          delegate('click', this.elements.container, 'button', this._onClick.bind(this));
+
+          this.elements.container.append(this.elements.ul, this.elements.btPrevious, this.elements.btNext);
+
+          return this.elements.container;
+        }
+      }
+
+      async function onReady() {
+        const slider = new Slider();
+        document.querySelector('#main').append(
+          await slider.render()
+        );
+      }
+
+      document.addEventListener('DOMContentLoaded', onReady, false);
+    </script>
+  </body>
+</html>
