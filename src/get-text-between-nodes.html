@@ -1,0 +1,59 @@
+<!doctype html>
+<html>
+  <head>
+    <title>getTextBetweenNodes</title>
+  </head>
+  <body>
+    <main>
+      <div>abc <span id="first-node">xxx</span>def<br>ghi</div>
+      <p><strong>jkl <span id="second-node">yyy</span>mno</strong></strong></p>
+    </main>
+
+    <script>
+      function getTextBetweenNodes(firstNode, secondNode) {
+        const result = [];
+        let foundFirstNode = false;
+        let foundSecondNode = false;
+
+        (function traverse(node) {
+          if (node === secondNode) {
+            foundSecondNode = true;
+            return;
+          }
+
+          if (node === firstNode) {
+            foundFirstNode = true;
+            return;
+          }
+
+          if (node.nodeType === Node.TEXT_NODE && foundFirstNode) {
+            const value = node.nodeValue.trim();
+            value && result.push(value);
+            return;
+          }
+
+          for (const child of node.childNodes) {
+            if (foundSecondNode) {
+              return;
+            }
+
+            traverse(child);
+          }
+        })(document.body);
+
+        return result;
+      }
+
+      function onReady() {
+        const result = getTextBetweenNodes(
+          document.querySelector('#first-node'),
+          document.querySelector('#second-node')
+        );
+
+        console.log('result', result);
+      }
+
+      document.addEventListener('DOMContentLoaded', onReady, false);
+    </script>
+  </body>
+</html>
