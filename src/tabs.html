@@ -36,13 +36,30 @@
         const elements = {};
         elements.contents = Array.from(root.querySelectorAll('*[data-tabname]'));
 
+        const events = new Map([
+          [root, 'click'],
+          [window, 'popstate']
+        ]);
+
+        const handlers = {};
+
+        handlers.onClick = ({ target }) => {
+          const tabName = target.dataset.tabname;
+          history.pushState(null, null, `#${tabName}`);
+
+          showTab(tabName);
+        };
+
+        handlers.onPostate = () => {
+          showTab(location.hash.slice(1));
+        };
+
         function showTab(tabName) {
           if (!tabName) {
             return;
           }
 
           for (const content of elements.contents) {
-            debugger;
             if (content.dataset.tabname === tabName) {
               content.classList.remove('off');
             } else {
@@ -51,18 +68,23 @@
           }
         }
 
-        function onClick({ target }) {
-          const tabName = target.dataset.tabname;
-          history.pushState(null, null, `#${tabName}`);
-
-          showTab(tabName);
-        }
-
         return {
-          destroy() {},
+          destroy() {
+            for (const evt of events) {
+              const element = evt[0];
+              const eventType = evt[1];
+              const callback = `on${eventType[0].toUpperCase()}${eventType.slice(1)}`;
+
+              element.removeEventListener(eventType, handlers[callback]);
+            }
+
+            if (elements.container) {
+              elements.container.remove();
+            }
+          },
 
           render() {
-            elements.fragment = document.createDocumentFragment();
+            elements.container = document.createElement('div');
             elements.button = document.createElement('button');
 
             for (let i = 0; i < elements.contents.length; i++) {
@@ -77,26 +99,25 @@
 
               button.dataset.tabname = tabName;
               button.textContent = tabName;
-              elements.fragment.appendChild(button);
+              elements.container.appendChild(button);
             }
 
             showTab(location.hash.slice(1));
 
-            window.addEventListener('popstate', () => {
-              showTab(location.hash.slice(1));
-            });
+            window.addEventListener('popstate', handlers.onPostate);
+            delegate('click', root, 'button[data-tabname]', handlers.onClick);
 
-            delegate('click', root, 'button[data-tabname]', onClick);
-
-            root.prepend(elements.fragment);
+            root.prepend(elements.container);
           },
         };
       }
 
       function onReady() {
-        new Tabs(
+        const tabs = new Tabs(
           document.querySelector('tab-panel')
-        ).render();
+        );
+
+        tabs.render();
       }
 
       document.addEventListener('DOMContentLoaded', onReady, false);
