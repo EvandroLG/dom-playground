@@ -70,11 +70,9 @@
 
         return {
           destroy() {
-            for (const evt of events) {
-              const [element, eventType] = evt;
-              const callback = `on${eventType[0].toUpperCase()}${eventType.slice(1)}`;
-
-              element.removeEventListener(eventType, handlers[callback]);
+            for (const [element, eventType] of events) {
+              const fn = `on${eventType[0].toUpperCase()}${eventType.slice(1)}`;
+              element.removeEventListener(eventType, handlers[fn]);
             }
 
             if (elements.container) {
