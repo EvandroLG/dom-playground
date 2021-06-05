@@ -71,8 +71,7 @@
         return {
           destroy() {
             for (const evt of events) {
-              const element = evt[0];
-              const eventType = evt[1];
+              const [element, eventType] = evt;
               const callback = `on${eventType[0].toUpperCase()}${eventType.slice(1)}`;
 
               element.removeEventListener(eventType, handlers[callback]);
