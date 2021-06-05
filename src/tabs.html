@@ -32,28 +32,9 @@
         }, false);
       }
 
-      function asTabs(element) {
+      function Tabs(root) {
         const elements = {};
-        elements.contents = Array.from(element.querySelectorAll('*[data-tabname]'));
-        elements.fragment = document.createDocumentFragment();
-        elements.button = document.createElement('button');
-
-        for (let i = 0; i < elements.contents.length; i++) {
-          const content = elements.contents[i];
-
-          if (i > 0) {
-            content.classList.add('off');
-          }
-
-          const button = elements.button.cloneNode(false);
-          const tabName = content.getAttribute('data-tabname');
-
-          button.setAttribute('data-tabname', tabName);
-          button.textContent = tabName;
-          elements.fragment.appendChild(button);
-        }
-
-        showTab(location.hash.slice(1));
+        elements.contents = Array.from(root.querySelectorAll('*[data-tabname]'));
 
         function showTab(tabName) {
           if (!tabName) {
@@ -61,7 +42,8 @@
           }
 
           for (const content of elements.contents) {
-            if (content.getAttribute('data-tabname') === tabName) {
+            debugger;
+            if (content.dataset.tabname === tabName) {
               content.classList.remove('off');
             } else {
               content.classList.add('off');
@@ -69,25 +51,52 @@
           }
         }
 
-        function onClick(e) {
-          const { target } = e;
-          const tabName = target.getAttribute('data-tabname');
+        function onClick({ target }) {
+          const tabName = target.dataset.tabname;
           history.pushState(null, null, `#${tabName}`);
 
           showTab(tabName);
         }
 
-        window.addEventListener('popstate', () => {
-          showTab(location.hash.slice(1));
-        });
+        return {
+          destroy() {},
 
-        delegate('click', element, 'button[data-tabname]', onClick);
+          render() {
+            elements.fragment = document.createDocumentFragment();
+            elements.button = document.createElement('button');
 
-        element.prepend(elements.fragment);
+            for (let i = 0; i < elements.contents.length; i++) {
+              const content = elements.contents[i];
+
+              if (i > 0) {
+                content.classList.add('off');
+              }
+
+              const button = elements.button.cloneNode(false);
+              const tabName = content.dataset.tabname;
+
+              button.dataset.tabname = tabName;
+              button.textContent = tabName;
+              elements.fragment.appendChild(button);
+            }
+
+            showTab(location.hash.slice(1));
+
+            window.addEventListener('popstate', () => {
+              showTab(location.hash.slice(1));
+            });
+
+            delegate('click', root, 'button[data-tabname]', onClick);
+
+            root.prepend(elements.fragment);
+          },
+        };
       }
 
       function onReady() {
-        asTabs(document.querySelector('tab-panel'));
+        new Tabs(
+          document.querySelector('tab-panel')
+        ).render();
       }
 
       document.addEventListener('DOMContentLoaded', onReady, false);
