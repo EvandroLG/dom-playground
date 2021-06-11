@@ -40,31 +40,43 @@
       class StarRating {
         constructor() {
           this.elements = {};
-        }
-
-        _onClick(e) {
-          this.elements.widget.classList.add('off');
-          const stars = this.elements.widget.querySelectorAll('li');
-
-          for (const star of stars) {
-            star.classList.remove('on');
-          }
-
-          let current = e.target;
-
-          while (current) {
-            current.classList.add('on');
-            current = current.previousElementSibling;
-          }
-
-          this.elements.widget.classList.remove('off');
-        }
-
-        render() {
           this.elements.widget = document.createElement('div');
           this.elements.list = document.createElement('ul');
           this.elements.li = document.createElement('li');
 
+          this.events = new Map([
+            [this.elements.widget, 'click']
+          ]);
+
+          this.handlers = {
+            onClick(e) {
+              this.elements.widget.classList.add('off');
+              const stars = this.elements.widget.querySelectorAll('li');
+
+              for (const star of stars) {
+                star.classList.remove('on');
+              }
+
+              let current = e.target;
+
+              while (current) {
+                current.classList.add('on');
+                current = current.previousElementSibling;
+              }
+
+              this.elements.widget.classList.remove('off');
+            }
+          };
+        }
+
+        destroy() {
+          this.elements.widget.remove();
+          this.events.forEach((eventType, element) => {
+            element.removeEventListener(eventType, this.handlers[`on${eventType[0].toUpperCase()}${eventType.slice(1)}`]);
+          });
+        }
+
+        render() {
           this.elements.widget.classList.add('star-rating');
           this.elements.widget.appendChild(this.elements.list);
 
@@ -73,7 +85,7 @@
             this.elements.list.appendChild(li);
           }
 
-          delegate(this.elements.widget, 'li', 'click', this._onClick.bind(this));
+          delegate(this.elements.widget, 'li', 'click', this.handlers.onClick.bind(this));
 
           return this.elements.widget;
         }
