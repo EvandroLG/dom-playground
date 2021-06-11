@@ -1,0 +1,92 @@
+<!doctype html>
+<html>
+  <head>
+    <title>
+      Star Rating
+    </title>
+    <style>
+      .off {
+        display: none;
+      }
+
+      .star-rating li {
+        display: inline-block;
+        margin-right: 5px;
+        width: 50px;
+        height: 50px;
+        border: 0;
+        border-radius: 50%;
+        background-color: gold;
+        opacity: 0.7;
+      }
+
+      .star-rating li.on {
+        opacity: 1;
+      }
+    </style>
+  </head>
+  <body>
+    <main></main>
+
+    <script>
+      function delegate(root, pattern, eventType, callback) {
+        root.addEventListener(eventType, (e) => {
+          if (e.target.matches(pattern)) {
+            callback.call(e.target, e);
+          }
+        });
+      }
+
+      class StarRating {
+        constructor() {
+          this.elements = {};
+        }
+
+        _onClick(e) {
+          this.elements.widget.classList.add('off');
+          const stars = this.elements.widget.querySelectorAll('li');
+
+          for (const star of stars) {
+            star.classList.remove('on');
+          }
+
+          let current = e.target;
+
+          while (current) {
+            current.classList.add('on');
+            current = current.previousElementSibling;
+          }
+
+          this.elements.widget.classList.remove('off');
+        }
+
+        render() {
+          this.elements.widget = document.createElement('div');
+          this.elements.list = document.createElement('ul');
+          this.elements.li = document.createElement('li');
+
+          this.elements.widget.classList.add('star-rating');
+          this.elements.widget.appendChild(this.elements.list);
+
+          for (let i = 0; i < 5; i++) {
+            const li = this.elements.li.cloneNode(false);
+            this.elements.list.appendChild(li);
+          }
+
+          delegate(this.elements.widget, 'li', 'click', this._onClick.bind(this));
+
+          return this.elements.widget;
+        }
+      }
+
+      function onReady() {
+        const starRating = new StarRating();
+        document.querySelector('main').appendChild(
+          starRating.render(),
+        );
+      }
+
+      document.addEventListener('DOMContentLoaded', onReady, false);
+    </script>
+  </body>
+</html>
