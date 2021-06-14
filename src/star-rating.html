@@ -44,27 +44,46 @@
           this.elements.list = document.createElement('ul');
           this.elements.li = document.createElement('li');
 
+          this.states = {
+            lastClicked: null,
+          };
+
           this.events = new Map([
-            [this.elements.widget, 'click']
+            [this.elements.widget, 'click'],
+            [this.elements.widget, 'mouseover'],
+            [this.elements.widget, 'mouseleave']
           ]);
+
+          function highlightStars(e, target) {
+            this.elements.widget.classList.add('off');
+            const stars = this.elements.widget.querySelectorAll('li');
+
+            for (const star of stars) {
+              star.classList.remove('on');
+            }
+
+            let current = target ? target : e.target;
+
+            while (current) {
+              current.classList.add('on');
+              current = current.previousElementSibling;
+            }
+
+            this.elements.widget.classList.remove('off');
+          }
 
           this.handlers = {
             onClick(e) {
-              this.elements.widget.classList.add('off');
-              const stars = this.elements.widget.querySelectorAll('li');
+              highlightStars.call(this, e);
+              this.states.lastClicked = e.target;
+            },
 
-              for (const star of stars) {
-                star.classList.remove('on');
-              }
+            onMouseover(e) {
+              highlightStars.call(this, e);
+            },
 
-              let current = e.target;
-
-              while (current) {
-                current.classList.add('on');
-                current = current.previousElementSibling;
-              }
-
-              this.elements.widget.classList.remove('off');
+            onMouseleave(e) {
+              highlightStars.call(this, e, this.states.lastClicked);
             }
           };
         }
@@ -86,6 +105,8 @@
           }
 
           delegate(this.elements.widget, 'li', 'click', this.handlers.onClick.bind(this));
+          delegate(this.elements.widget, 'li', 'mouseover', this.handlers.onMouseover.bind(this));
+          this.elements.widget.addEventListener('mouseleave', this.handlers.onMouseleave.bind(this));
 
           return this.elements.widget;
         }
