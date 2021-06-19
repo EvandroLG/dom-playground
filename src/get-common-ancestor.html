@@ -11,14 +11,14 @@
 
     <script>
       function getCommonAncestor(nodeA, nodeB) {
-        let parentElement = nodeA.parentElement;
+        let current = nodeA.parentElement;
 
-        while (parentElement) {
-          if (parentElement.contains(nodeB)) {
-            return parentElement;
+        while (current) {
+          if (current.contains(nodeB)) {
+            return current;
           }
 
-          parentElement = parentElement.parentElement;
+          current = current.parentElement;
         }
 
         return null;
