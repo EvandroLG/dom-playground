@@ -1,0 +1,42 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Get Common Ancestor</title>
+  </head>
+  <body>
+    <main>
+      <div>abc <span id="first-node">xxx</span>def<br>ghi</div>
+      <p><strong>jkl <span id="second-node">yyy</span>mno</strong></p>
+    </main>
+
+    <script>
+      function getCommonAncestor(nodeA, nodeB) {
+        let parentElement = nodeA.parentElement;
+
+        while (parentElement) {
+          if (parentElement.contains(nodeB)) {
+            return parentElement;
+          }
+
+          parentElement = parentElement.parentElement;
+        }
+
+        return null;
+      }
+
+      function onReady() {
+        const elements = {};
+        elements.ancestor = getCommonAncestor(
+          document.querySelector('#first-node'),
+          document.querySelector('#second-node')
+        );
+
+        if (elements.ancestor) {
+          elements.ancestor.style.border = '1px solid red';
+        }
+      }
+
+      document.addEventListener('DOMContentLoaded', onReady);
+    </script>
+  </body>
+</html>
