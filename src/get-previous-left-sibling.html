@@ -1,0 +1,69 @@
+<!doctype html>
+<html>
+  <head>
+    <title>
+      getPreviousLeftSibling
+    </title>
+    <style>
+      .side {
+        float: left;
+        width: 100px;
+        height: 100px;
+        background: red;
+        margin-right: 5px;
+      }
+    </style>
+  </head>
+  <body>
+    <div>
+      <div class="side">
+        <p>
+          <a></a>
+        </p>
+        <p>
+          <button></button>
+        </p>
+      </div>
+      <div class="side">
+        <p></p>
+      </div>
+      <div class="side">
+        <p>
+          <a id="target"></a>
+          <a></a>
+        </p>
+      </div>
+    </div>
+
+    <script>
+      function getPreviousLeftSibling(target) {
+        if (target.previousElementSibling) {
+          return target.previousElementSibling;
+        }
+
+        let current = target.parentElement;
+
+        while (current) {
+          current = getPreviousLeftSibling(current);
+
+          if (current && current.lastElementChild) {
+            return current.lastElementChild;
+          }
+        }
+
+        return null;
+      }
+
+      function onReady() {
+        const elements = {};
+        elements.sibling = getPreviousLeftSibling(document.querySelector('#target'))
+
+        if (elements.sibling) {
+          elements.sibling.style.border = '1px solid red';
+        }
+      }
+
+      document.addEventListener('DOMContentLoaded', onReady);
+    </script>
+  </body>
+</html>
