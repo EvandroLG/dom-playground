@@ -1,0 +1,144 @@
+<!doctype html>
+<html>
+  <head>
+    <title>TODO</title>
+  </head>
+  <body>
+    <main>
+    </main>
+
+    <script>
+      class Todo {
+        constructor() {
+          this.storage = window.localStorage;
+          this.notes = {};
+          this.elements = {};
+
+          this.elements.fragment = document.createDocumentFragment();
+          this.elements.label = document.createElement('label');
+          this.elements.select = document.createElement('select');
+          this.elements.option = document.createElement('option');
+          this.elements.buttonAdd = document.createElement('button');
+          this.elements.textarea = document.createElement('textarea');
+
+          this.events = new Map([
+            [this.elements.buttonAdd, ['click', this._onClick.bind(this)]],
+            [this.elements.textarea, ['change', this._onChangeTextarea.bind(this)]],
+            [this.elements.select, ['change', this._onChangeSelect.bind(this)]]
+          ]);
+        }
+
+        _setState(name) {
+          this.notes[name] = this.elements.textarea.value;
+          this.storage.setItem('notes', JSON.stringify(this.notes));
+        }
+
+        _onClick() {
+          const name = window.prompt('Note name');
+
+          if (!name) {
+            return;
+          }
+
+          const option = this.elements.option.cloneNode();
+          option.selected = true;
+          option.textContent = name;
+          this.elements.select.append(option);
+          this.elements.textarea.value = '';
+          this.elements.textarea.focus();
+
+          this._setState(name, '');
+        }
+
+        _onChangeTextarea() {
+          const select = this.elements.select;
+          const name = select.options[select.selectedIndex].value;
+
+          this._setState(name, this.elements.textarea.textContent);
+        }
+
+        _onChangeSelect(e) {
+          this.elements.textarea.value = this.notes[e.target.value];
+        }
+
+        _bind() {
+          for (const [element, [eventName, callback]] of this.events) {
+            element.addEventListener(
+              eventName,
+              callback
+            );
+          }
+        }
+
+        _load() {
+          const notes = JSON.parse(
+            this.storage.getItem('notes')
+          );
+
+          if (!notes) {
+            return;
+          }
+
+          this.notes = notes;
+          const keys = Object.keys(notes);
+          const select = this.elements.select;
+
+          for (const key of keys) {
+            const option = this.elements.option.cloneNode();
+            option.textContent = key;
+            select.append(option);
+          }
+
+          this.elements.textarea.value = notes[select.options[select.selectedIndex].value];
+        }
+
+        destroy() {
+          for (const [element, [eventName, callback]] of this.events) {
+            element.removeEventListener(
+              eventName,
+              callback
+            );
+          }
+
+          this.events = [];
+
+          const elements = Object.keys(this.elements);
+          for (const element of elements) {
+            element.remove();
+          }
+        }
+
+        render() {
+          this._load();
+
+          this.elements.label.append(
+            document.createTextNode('Notes: '),
+            this.elements.select
+          );
+
+          this.elements.buttonAdd.textContent = 'Add';
+          this.elements.textarea.style.width = '100%';
+
+          this.elements.fragment.append(
+            this.elements.label,
+            this.elements.buttonAdd,
+            this.elements.textarea
+          );
+
+          this._bind();
+
+          return this.elements.fragment;
+        }
+      }
+
+      function onReady() {
+        const todo = new Todo();
+        document.querySelector('main').append(
+          todo.render()
+        );
+      }
+
+      document.addEventListener('DOMContentLoaded', onReady);
+    </script>
+  </body>
+</html>
