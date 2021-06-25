@@ -1,0 +1,37 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Replace Selection</title>
+  </head>
+  <body>
+    <textarea></textarea>
+
+    <script>
+      function replaceSelection(field, word) {
+        const from = field.selectionStart;
+        const to = field.selectionEnd;
+
+        field.value = `${field.value.slice(0, from)}${word}${field.value.slice(to)}`;
+
+        field.selectionStart = from + word.length;
+        field.selectionEnd = from + word.length;
+      }
+
+      function onReady() {
+        const elements = {};
+        elements.textarea = document.querySelector('textarea');
+
+        function onKeydown(e) {
+          if (e.keyCode === 113) {
+            replaceSelection(elements.textarea, 'Evandro');
+            e.preventDefault();
+          }
+        }
+
+        elements.textarea.addEventListener('keydown', onKeydown);
+      }
+
+      document.addEventListener('DOMContentLoaded', onReady);
+    </script>
+  </body>
+</html>
