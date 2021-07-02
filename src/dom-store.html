@@ -1,0 +1,60 @@
+<!doctype html>
+<html>
+  <head>
+    <title>
+      DOMStore
+    </title>
+  </head>
+  <body>
+    <main>
+      <h1>Lorem ipsum</h1>
+    </main>
+
+    <script>
+      class DOMStore {
+        #memo = {};
+        #key = '__node_id__';
+        #id = 0;
+
+        set(dom, value) {
+          if (this.has(dom)) {
+            const id = dom.dataset[this.#key];
+            this.#memo[id] = value;
+          } else {
+            const id = ++this.#id;
+            dom.dataset[this.#key] = id;
+            this.#memo[id] = value;
+          }
+        }
+
+        get(dom) {
+          if (this.has(dom)) {
+            const id = dom.dataset[this.#key];
+            return this.#memo[id];
+          }
+
+          return null;
+        }
+
+        has(dom) {
+          return dom.dataset.hasOwnProperty(this.#key);
+        }
+
+        remove(dom) {
+          delete dom.dataset[this.#key];
+        }
+      }
+
+
+      function onReady() {
+        const domStore = new DOMStore();
+        const h1 = document.querySelector('h1');
+        domStore.set(h1, true);
+        console.log(domStore.get(h1));
+        domStore.remove(h1);
+      }
+
+      document.addEventListener('DOMContentLoaded', onReady);
+    </script>
+  </body>
+</html>
