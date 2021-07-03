@@ -10,19 +10,38 @@
     </main>
 
     <script>
+      function getCommonAcestor(firstNode, secondNode) {
+        let current = firstNode.parentElement;
+
+        while (current) {
+          if (current.contains(secondNode)) {
+            return current;
+          }
+
+          current = current.parentElement;
+        }
+
+        return null;
+      }
+
       function getTextBetweenNodes(firstNode, secondNode) {
         const result = [];
+        const commonParent = getCommonAcestor(firstNode, secondNode);
         let foundFirstNode = false;
         let foundSecondNode = false;
 
         (function traverse(node) {
-          if (node === secondNode) {
-            foundSecondNode = true;
+          if (!node) {
             return;
           }
 
           if (node === firstNode) {
             foundFirstNode = true;
+            return;
+          }
+
+          if (node === secondNode) {
+            foundSecondNode = true;
             return;
           }
 
@@ -39,7 +58,7 @@
 
             traverse(child);
           }
-        })(document.body);
+        })(commonParent);
 
         return result;
       }
