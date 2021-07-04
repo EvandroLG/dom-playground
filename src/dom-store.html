@@ -41,7 +41,9 @@
         }
 
         remove(dom) {
+          const id = dom.dataset[this.#key];
           delete dom.dataset[this.#key];
+          delete this.#memo[id];
         }
       }
 
