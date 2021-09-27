@@ -39,25 +39,31 @@
           this.elements.progressBar.appendChild(this.elements.span);
         }
 
-        startAnimation() {
-          if (!this.queue.length) {
-            return;
-          }
+        startAnimation(progressBar) {
+          const handlePromise = (resolve) => {
+            setTimeout(() => {
+              progressBar.classList.add('start');
+              progressBar.addEventListener('transitionend', () => {
+                resolve();
+              });
+            }, 1000);
+          };
 
-          setTimeout(() => {
-            const progressBar = this.queue.shift();
-            progressBar.classList.add('start');
-            progressBar.addEventListener('transitionend', () => {
-              this.startAnimation();
-            });
-          }, 1000);
+          this.queue.push(() => new Promise(handlePromise));
+
+          (function startAnimationHelper() {
+            if (!this.queue.length) {
+              return;
+            }
+
+            const promise = this.queue.shift();
+            promise().then(startAnimationHelper.bind(this));
+          }).call(this);
         }
 
         render(root) {
           const progressBar = this.elements.progressBar.cloneNode(true);
-          this.queue.push(progressBar);
-          this.startAnimation();
-
+          this.startAnimation(progressBar);
           root.appendChild(progressBar);
         }
       }
