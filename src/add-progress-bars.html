@@ -31,6 +31,7 @@
     <script>
       class ProgressBar {
         constructor() {
+          this.isAnimationRunning = false;
           this.queue = [];
           this.elements = {};
           this.elements.progressBar = document.createElement('div');
@@ -41,24 +42,29 @@
 
         startAnimation(progressBar) {
           const handlePromise = (resolve) => {
+            this.isAnimationRunning = true;
+
             setTimeout(() => {
               progressBar.classList.add('start');
               progressBar.addEventListener('transitionend', () => {
+                this.isAnimationRunning = false;
                 resolve();
               });
-            }, 1000);
+            }, 10);
           };
 
-          this.queue.push(() => new Promise(handlePromise));
+          if (this.isAnimationRunning || this.queue.length) {
+            this.queue.push(() => new Promise(handlePromise));
+          } else {
+            new Promise(handlePromise).then(function startAnimationHelper() {
+              if (!this.queue.length) {
+                return;
+              }
 
-          (function startAnimationHelper() {
-            if (!this.queue.length) {
-              return;
-            }
-
-            const promise = this.queue.shift();
-            promise().then(startAnimationHelper.bind(this));
-          }).call(this);
+              const promise = this.queue.shift();
+              promise().then(startAnimationHelper.bind(this));
+            }.bind(this));
+          }
         }
 
         render(root) {
