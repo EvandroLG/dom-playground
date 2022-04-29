@@ -1,0 +1,146 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Replies</title>
+    <style>
+      .comment {
+        margin-left: 15px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="main"></div>
+    <script>
+      function postApi() {
+        return {
+          title: 'Title',
+          description: 'My description is blablabla',
+          comments: {
+            head: {
+              id: '1'
+            },
+            tail: {
+              id: '5'
+            }
+          }
+        };
+      }
+
+      function commentsApi() {
+        return {
+          8: {
+            comment: 'Lorem Ipsum 8',
+            parentId: null,
+            next: null
+          },
+          7: {
+            comment: 'Lorem Ipsum 7',
+            parentId: 6,
+            next: 8
+          },
+          6: {
+            comment: 'Lorem Ipsum 6',
+            parentId: 1,
+            next: null
+          },
+          5: {
+            comment: 'Lorem Ipsum 5',
+            parentId: null,
+            next: null
+          },
+          4: {
+            comment: 'Lorem Ipsum 4',
+            parentId: null,
+            next: 5
+          },
+          3: {
+            comment: 'Lorem Ipsum 3',
+            parentId: 2,
+            next: null
+          },
+          2: {
+            comment: 'Lorem Ipsum 2',
+            parentId: null,
+            next: 4
+          },
+          1: {
+            comment: 'Lorem Ipsum 1',
+            parentId: null,
+            next: 2
+          },
+        };
+      }
+
+      function renderPost(fragment, titleText, descriptionText) {
+        const post = document.createElement('div');
+        const title = document.createElement('h1');
+        const description = document.createElement('p');
+
+        title.textContent = titleText;
+        description.textContent = descriptionText;
+
+        post.append(title);
+        post.append(description);
+        fragment.append(post);
+      }
+
+      function getChildren(parentId, comments) {
+        return Object.keys(comments).filter(key => comments[key].parentId == parentId);
+      }
+
+      function normalizeComments(comments) {
+        const copy = Object.assign({}, comments);
+        const keys = Object.keys(copy);
+
+        for (const key of keys) {
+          copy[key].children = getChildren(key, copy);
+        }
+
+        return copy;
+      }
+
+      function renderComments(fragment, head, tail, comments) {
+        const commentList = document.createElement('div');
+        commentList.classList.add('comments');
+        const normalizedComments = normalizeComments(comments);
+
+        (function traverse(node, parent) {
+          if (!node) {
+            return;
+          }
+
+          const div = document.createElement('div');
+          div.classList.add('comment');
+          div.textContent = comments[node].comment;
+          const children = comments[node].children;
+
+          if (children) {
+            for (const child of children) {
+              traverse(child, div);
+            }
+          }
+
+          div.after(traverse(comments[node].next, parent));
+          parent.append(div);
+        })(head.id, commentList);
+
+        fragment.append(commentList);
+      }
+
+      function render(titleText, descriptionText, headComment, tailComment, comments) {
+        const fragment = document.createDocumentFragment();
+        renderPost(fragment, titleText, descriptionText);
+        renderComments(fragment, headComment, tailComment, comments);
+        document.querySelector('#main').append(fragment);
+      }
+
+      function onReady() {
+        const { title, description, comments: { head: headComment, tail: tailComment } } = postApi();
+        const comments = commentsApi();
+        render(title, description, headComment, tailComment, comments);
+      }
+
+      document.addEventListener('DOMContentLoaded', onReady);
+    </script>
+  </body>
+</html>
