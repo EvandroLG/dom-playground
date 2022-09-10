@@ -1,0 +1,108 @@
+<!doctype html>
+<html>
+  <head>
+    <title>
+      Drag and Drop
+    </title>
+
+    <style>
+      main {
+        display: flex;
+        gap: 5%;
+      }
+
+      .column {
+        flex-basis: 20%;
+        min-height: 90vh;
+        background-color: #ddd;
+      }
+
+      .task {
+        padding: 10px;
+        background: #fff;
+        margin-bottom: 5%;
+      }
+
+      .off {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <div class="column">
+        <h1>All tasks</h1>
+        <div class="task" draggable="true">
+          Task 1
+        </div>
+
+        <div class="task" draggable="true">
+          Task 2
+        </div>
+
+        <div class="task" draggable="true">
+          Task 3
+        </div>
+
+        <div class="task" draggable="true">
+          Task 4
+        </div>
+      </div>
+
+      <div class="column">
+        <h1>In progress</h1>
+      </div>
+
+      <div class="column">
+        <h1>Done</h1>
+      </div>
+    </main>
+
+    <script>
+      class DragAndDrop {
+        constructor(draggableItems, droppableItems) {
+          this.current = null;
+
+          for (const item of draggableItems) {
+            item.addEventListener('dragstart', this.#onDragStart.bind(this));
+            item.addEventListener('dragend', this.#onDragEnd.bind(this));
+          }
+
+          for (const item of droppableItems) {
+            item.addEventListener('dragover', this.#onDragOver.bind(this));
+            item.addEventListener('drop', this.#onDrop.bind(this));
+          }
+        }
+
+        #onDragStart(e) {
+          this.current = e.target;
+          setTimeout(() => {
+            e.target.classList.add('off');
+          }, 0);
+        }
+
+        #onDragEnd(e) {
+          e.target.classList.remove('off');
+          this.current = null;
+        }
+
+        #onDragOver(e) {
+          e.preventDefault();
+        }
+
+        #onDrop(e) {
+          e.target.append(this.current);
+        }
+      }
+
+      function onReady() {
+        const tasks = document.querySelectorAll('.task');
+        const columns = document.querySelectorAll('.column');
+
+        new DragAndDrop(tasks, columns);
+      }
+
+      document.addEventListener('DOMContentLoaded', onReady);
+    </script>
+  </body>
+</html>
